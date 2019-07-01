@@ -25,9 +25,65 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
         <?= $this->fetch('title') ?>
     </title>
     <?= $this->Html->meta('icon') ?>
-
     <?= $this->Html->css('base.css') ?>
     <?= $this->Html->css('style.css') ?>
+
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <?= $this->Html->meta('icon') ?>
+    <?= $this->Html->script('chart.min') ?>
+    <?= $this->Html->script('jquery-3.1.1.min') ?>
+    <?= $this->Html->script('jquery-ui-1.12.1') ?>
+    <?= $this->Html->script('jquery.ui.custom') ?>
+    <?= $this->Html->script('jquery-1.12.4.min') ?>
+    <?= $this->Html->script('jquery-ui-1.12.1.min') ?>
+    <?= $this->Html->script('weekPicker') ?>
+    <?= $this->Html->script('default') ?>
+    <?= $this->Html->script('excanvas.min') ?>
+    <?= $this->Html->script('jquery.dataTables.min') ?>
+    <?= $this->Html->script('jquery.min') ?>
+    <?= $this->Html->script('notify.min') ?>
+    <?= $this->Html->script('jquery.easy-pie-chart') ?>
+    <!-- <?= $this->Html->script('jquery.flot.crosshair') ?> 
+    <?= $this->Html->script('jquery.flot.min') ?>
+    <?= $this->Html->script('jquery.flot.pie') ?>
+    <?= $this->Html->script('jquery.flot.pie.min') ?>
+    <?= $this->Html->script('jquery.flot.pie.min') ?>
+    <?= $this->Html->script('jquery.flot.stack') ?>
+    <?= $this->Html->script('jquery.flot.resize.min') ?> 
+    <?= $this->Html->script('jquery.gritter.min') ?> -->
+    <?= $this->Html->script('jquery.min') ?>
+    <?= $this->Html->script('select2.min') ?>
+    <?= $this->Html->script('jquery.peity.min') ?>
+    <?= $this->Html->script('jquery.uniform') ?>
+    <?= $this->Html->script('jquery.validate') ?>
+    <?= $this->Html->script('bootstrap.min') ?>
+    <?= $this->Html->script('bootstrap-colorpicker') ?>
+    <?= $this->Html->script('bootstrap-datepicker') ?>
+    <?= $this->Html->script('bootstrap-wysihtml5') ?>
+    <?= $this->Html->script('masked') ?>
+    <?= $this->Html->script('matrix') ?>
+    <?= $this->Html->script('matrix.login') ?>
+    <?= $this->Html->script('matrix.popover') ?>
+    <!-- <?= $this->Html->script('matrix.tables') ?> 
+    <?= $this->Html->script('matrix.wizard') ?>
+    <?= $this->Html->script('matrix.calendar') ?>
+    <?= $this->Html->script('matrix.charts') ?>
+    <?= $this->Html->script('matrix.chat') ?>
+    <?= $this->Html->script('matrix.dashboard') ?> -->
+  <!--  <?= $this->Html->script('matrix.form_common') ?> -->
+  <!--   <?= $this->Html->script('matrix.form_validation') ?>
+    <?= $this->Html->script('matrix.interface') ?> -->
+
+    <!-- js files for daterangepicker -->
+    <?= $this->Html->script('jquery-ui-1.11.4.min') ?>
+    <?= $this->Html->script('moment.min') ?>
+    <?= $this->Html->script('jquery.comiseo.daterangepicker.min') ?>
+    <!-- js files for daterangepicker -->
+
+    <?= $this->Html->script('jquery.tablesorter') ?>
+
+    <!--<?= $this->Html->script('bootstrap-datetimepicker.min') ?>-->
 
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
