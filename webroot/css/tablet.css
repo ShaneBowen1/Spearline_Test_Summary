@@ -1,0 +1,147 @@
+@media (min-width: 481px) and (max-width: 970px) {
+/*@media (min-width: 768px) and (max-width: 1024px) {*/
+   .content-default {
+		background: none repeat scroll 0 0 #fff;
+	    margin-left: 51px;
+	    margin-right: 0;
+	    padding-bottom: 25px;
+	    position: relative;
+	    min-height: 100%;
+	    width: auto;
+	}
+
+	#sidebar{
+		width: 51px;
+	    display: block;
+	    position: absolute;
+	    height: 100%;
+	    z-index: 1;
+	    background-color: #03a9f4;
+	}
+
+	#header {
+	    height: 50px;
+	    position: relative;
+	    width: 100%;
+	    z-index: -9;
+	}
+
+	#header h1 {
+	    background: url(../img/spearline-logo-mini.png) no-repeat scroll 0 0 transparent;
+	    height: 100px;
+	    left: 8px;
+	    bottom: 10px;
+	    line-height: 600px;
+	    overflow: hidden;
+	    position: relative;
+	    top: 10px;
+	    width: 191px;
+	}
+
+	#user-nav {
+	    position: absolute;
+	    left: 50px;
+	    top: 0px;
+	    z-index: 20;
+	    margin: 0;
+	}
+
+	#user-nav > ul > li > a {
+		height: 32px !important;
+	}
+
+	.eto_logo{
+		height: 40px !important;
+	}
+
+	#user-nav > ul{
+		height: 50px !important;
+	}
+
+	#user-nav > ul >li{
+		height: 50px !important;
+	}
+
+	#user-nav > ul >li:hover{
+		background-color: #2f3d54 !important;
+	}
+
+	li{
+		line-height: 24px;
+	}
+
+	#default_timezone{
+	    margin-top: 3px;
+	    margin-bottom: 0px !important;
+	    max-width: 100%;
+	    -webkit-appearance:none;
+	}
+
+	#user-nav #timezone-dropdown{
+	    padding-top: 0px;
+	}
+
+	#change_timezone{
+		padding: 0px !important;
+		height: 50px !important;
+	}
+
+	.tablet_hide{
+		display: none;
+	}
+
+	img{
+		max-width: none;
+	}
+
+	.select{
+		width: 140px;
+
+	}
+
+	.submenu{
+		border-bottom: 1px solid #7abdff;
+	}
+
+	.footer{
+		width: 100%;
+    	bottom: 0px;
+    	z-index: 100;
+    	position: relative;
+	}
+
+	.child_footer{
+		background-color: #fff !important;
+		margin-left: 51px;
+	}
+
+	.copyright, .contact{
+		color: #2f3d54 !important;
+	}
+
+	.contact:hover{
+		background-color: #fff !important;
+		color: #03a9f4 !important;
+	}
+
+
+	.changed-status{
+		max-width: 140px !important;
+	}
+
+	.searchBoxFilter{ width: 100% }
+
+	.reset_button_wider{ margin-left: 12% !important; }
+
+	.widerFilter{ width: 16% !important; }
+
+	.comiseo-daterangepicker {
+		display: inline-block !important;
+	}
+
+	.scrollme {
+	    overflow-y: auto;
+	}
+
+
+}

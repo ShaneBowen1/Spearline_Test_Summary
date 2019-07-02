@@ -1,0 +1,136 @@
+@media (max-width: 680px){
+
+	#header{
+		height: 100px !important;
+	}
+	#header h1 {
+	    background: url(../img/spearline.png) no-repeat scroll 0 0 transparent;
+	    top: 15px;
+    	left: 0px; 
+    	margin-left: 30%;
+	}
+
+	.content-default {
+/*		background: none repeat scroll 0 0 #eeeeee;
+*/	    margin-left: 0%;
+	    margin-right: 0;
+	    padding-bottom: 25px;
+	    position: relative;
+	    min-height: 100%;
+	    width: auto;
+	}
+
+	#user-nav > ul > li {
+	    width: 24%;
+	}
+
+	#copyto {
+	    display: none;
+	}
+
+	#default_timezone{
+		margin-top: 6px;
+	    margin-bottom: 0px !important;
+	    width: 90px;
+	    background-color: #2f3d54;
+	   /* -webkit-appearance:none;*/
+	}
+
+	#user-nav #timezone-dropdown{
+	    padding-top: 0px;
+	    width: 49%;
+	}
+
+	#default_timezone{
+		width: 50%;
+		text-align: center;
+		-webkit-appearance:none;
+	}
+
+	.logout{
+		width: 50% !important;
+	}
+
+	.phone_hide{
+		display: none;
+	}
+
+	img{
+		max-width: none;
+	}
+
+	.changed-status{
+		width: 75px;
+	}
+
+	#user-nav > ul > li {
+	    border-left: none; 
+	    border-right: 1px solid #7abdff;
+	}
+
+
+	#reset_button{
+		width: 100%;
+    	margin-bottom: 5%;
+    	margin-left: 0% !important;
+	}
+
+	.customDateTimeRangePicker{
+    	width: 96%;
+	}
+
+	#call-start-time, #filter_weeknumber{
+    	width: 96%;
+	}
+
+	.footer{
+		width: 100%;
+    	bottom: 0px;
+    	z-index: 100;
+    	position: relative;
+	}
+
+	.copyright, .contact{
+		color: #2f3d54 !important;
+	}
+
+	.child_footer{
+		background-color: #03a9f4 !important;
+	}
+
+	.contact:hover{
+		color: #fff !important;
+	}
+
+	.content{
+		border-top: 1px solid #03a9f4 !important;
+		list-style-type: none;
+	}
+
+	.comiseo-daterangepicker-triggerbutton.ui-button {
+   		width: 100%;
+	}
+
+	#call_start_timesummary{
+		width: 97%;
+	}
+
+	.widerFilter{
+		width: 100% !important;
+	}
+
+	.searchBoxFilter{ width: 95% }
+
+	.country_code, .country_col, .country_flag{
+		display: block !important;
+	}
+
+	.fp_number{
+		border-left: 1px solid #ddd !important;
+	}
+
+	.scrollme {
+	    overflow-y: auto;
+	}
+
+}

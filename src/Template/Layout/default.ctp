@@ -18,17 +18,12 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
 <!DOCTYPE html>
 <html>
 <head>
-    <?= $this->Html->charset() ?>
+<?= $this->Html->charset() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:100,300,400,600, 700" rel="stylesheet">
     <title>
-        <?= $cakeDescription ?>:
-        <?= $this->fetch('title') ?>
+        <?= $title ?>
     </title>
-    <?= $this->Html->meta('icon') ?>
-    <?= $this->Html->css('base.css') ?>
-    <?= $this->Html->css('style.css') ?>
-
-
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <?= $this->Html->meta('icon') ?>
     <?= $this->Html->script('chart.min') ?>
@@ -83,11 +78,38 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
 
     <?= $this->Html->script('jquery.tablesorter') ?>
 
+
     <!--<?= $this->Html->script('bootstrap-datetimepicker.min') ?>-->
+
+    <?= $this->Html->css('default.css') ?>
+    <?= $this->Html->css('bootstrap-datetimepicker') ?>
+    <?= $this->Html->css('bootstrap.min.css') ?>
+    <!-- css files for daterangepicker -->
+    <?= $this->Html->css('jquery-ui.min.css') ?>
+    <?= $this->Html->css('jquery.comiseo.daterangepicker.css') ?>
+    <!-- css files for daterangepicker -->
+    <?= $this->Html->css('daterangepicker.min.css') ?>
+    <?= $this->Html->css('bootstrap-responsive.min.css') ?>
+    <?= $this->Html->css('colorpicker.css') ?>
+    <?= $this->Html->css('datepicker.css') ?>
+    <?= $this->Html->css('font-awesome.css') ?>
+    <?= $this->Html->css('jquery.easy-pie-chart.css') ?>
+    <?= $this->Html->css('jquery.gritter.css') ?>
+    <!-- <?= $this->Html->css('matrix-media.css') ?> -->
+    <?= $this->Html->css('matrix-style.css') ?>
+    <?= $this->Html->css('select2.css') ?>
+    <?= $this->Html->css('uniform.css') ?>
+    <?= $this->Html->css('phone.css') ?>
+    <?= $this->Html->css('tablet.css') ?>
+    <?= $this->Html->css('/fontawesome/css/font-awesome.css') ?>
+    <?= $this->Html->css('theme.default.css') ?>
+    <!-- <?= $this->Html->css('notify.css') ?> -->
 
     <?= $this->fetch('meta') ?>
     <?= $this->fetch('css') ?>
     <?= $this->fetch('script') ?>
+
+    <?= $this->Flash->render() ?>
 </head>
 <body>
     <nav class="top-bar expanded" data-topbar role="navigation">

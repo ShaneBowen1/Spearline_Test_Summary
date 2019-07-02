@@ -12,6 +12,15 @@ use App\Controller\AppController;
  */
 class SummaryHourlyController extends AppController
 {
+    public function initialize()
+    {
+        parent::initialize();
+        $this->loadComponent('RequestHandler');
+        $this->loadComponent('Search.Prg', [
+            'actions' => ['overallTests']
+        ]);
+    }
+
     /**
      * Index method
      *
@@ -24,14 +33,7 @@ class SummaryHourlyController extends AppController
         // ];
         $summaryHourly = $this->paginate($this->SummaryHourly);
 
-
-        $totalTestsBreakdown = $this->SummaryHourly->find('all')
-            ->SELECT(['hour_timestamp'=>'hour_timestamp', 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
-            ->where(['updated' == 1])
-            ->group(['hour_timestamp'])
-            ->toArray();
-
-        $this->set(compact('summaryHourly', 'totalTestsBreakdown'));
+        $this->set(compact('summaryHourly'));
     }
 
     /**
@@ -44,7 +46,7 @@ class SummaryHourlyController extends AppController
     public function view($id = null)
     {
         $summaryHourly = $this->SummaryHourly->get($id, [
-            'contain' => ['Company']
+            'contain' => ['Company', 'individualCompanyTests']
         ]);
 
         $this->set('summaryHourly', $summaryHourly);
@@ -114,5 +116,62 @@ class SummaryHourlyController extends AppController
         }
 
         return $this->redirect(['action' => 'index']);
+    }
+
+    public function overallTests()
+    {
+        $summaryHourly = $this->paginate($this->SummaryHourly);
+        
+        /*If no daterange selected in filter then show results for current week only*/
+        if(empty($this->request->query['date'])){
+            // $startDate = date('Y-m-d H:i:s', strtotime("-1 month"));
+            // $endDate = date('Y-m-d H:i:s');
+            $startDate = date('Y-m-01 00:00:00', strtotime("-1 month"));
+            $endDate = date('Y-m-t 23:59:59', strtotime("-1 month"));
+        $this->request->query['date'] = $startDate . " - ". $endDate;
+        }else{
+            /*If date range is selected then decode it*/
+            $filter_date_range_decoded = json_decode($this->request->query['date']);
+
+            /*If date range in query string contains start and end parameter then use them directly*/
+            if(isset($filter_date_range_decoded->start) && isset($filter_date_range_decoded->end)){
+                $startDate =  $filter_date_range_decoded->start." 00:00:00";
+                $endDate = $filter_date_range_decoded->end." 23:59:59";
+            }else{
+                /*If date range in query string not contains start and end parameter then explode and use*/
+                $filter_date_range_decoded = explode(" - ", $this->request->query['date']);
+                $startDate =  $filter_date_range_decoded[0];
+                $endDate = $filter_date_range_decoded[1];
+            }
+        }
+        $drStartDate = date('Y-m-d', strtotime($startDate));
+        $drEndDate = date('Y-m-d', strtotime($endDate));
+
+        $totalTestsBreakdown = $this->SummaryHourly->find('all')
+            ->SELECT(['hour_timestamp'=>'hour_timestamp', 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
+            ->where(['hour_timestamp >=' => $startDate, 'hour_timestamp < ' => $endDate])
+            ->group(['hour_timestamp'])
+            ->toArray();
+
+        $filters = $this->SummaryHourly->getFilters();
+
+        $this->set(compact('summaryHourly', 'totalTestsBreakdown' , 'filters', 'drStartDate', 'drEndDate'));
+    }
+
+
+    public function individualCompanyTests()
+    {
+        $summaryHourly = $this->paginate($this->SummaryHourly);
+
+        $startDate = date('Y-m-d H:i:s', strtotime("-1 week"));
+        $endDate = date('Y-m-d H:i:s');
+
+        $totalTestsBreakdown = $this->SummaryHourly->find('all')
+            ->SELECT(['hour_timestamp'=>'hour_timestamp', 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
+            ->where(['hour_timestamp >=' => $startDate, 'hour_timestamp < ' => $endDate])
+            ->group(['hour_timestamp'])
+            ->toArray();
+
+        $this->set(compact('summaryHourly', 'totalTestsBreakdown'));
     }
 }

@@ -1,0 +1,868 @@
+.content-default {
+	background: none repeat scroll 0 0 #fff;
+    margin-left: 220px;
+    margin-right: 0;
+    padding-bottom: 25px;
+    position: relative;
+    min-height: 100%;
+    width: auto;
+}
+
+.modal-title {
+	text-align: center;
+}
+
+#actions-sidebar{
+	float: right;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+hr{
+	width: 100%;
+}
+
+.error{
+    background-color: #f74d4d !important;
+    color: #fff !important;
+}
+
+.warning{
+    background-color: #ffbc00 !important;
+    color: #fff !important;
+}
+
+.success,.good{
+    background-color: #8BC34A !important;
+    color: #fff !important;
+}
+
+fieldset div.error-message{
+    margin-left: 170px;
+    color: red;
+    clear: both;
+    margin-bottom: 10px;
+    font-size: 12px;
+}
+
+.message {
+    margin-top: 10px;
+    width: 295px;
+    height: 35px;
+    padding-top: 8px;
+    font-size: 16px;
+    padding-left: 10px;
+    padding-right: 10px;
+    overflow: hidden;
+    width: 100%;
+    text-align: center;
+    position: fixed;
+    bottom: 0px;
+    z-index: 100;
+}
+
+.hiddenElement{
+	display: none;
+}
+
+/***more options menu***/
+#page_options {
+    display: inline-block;
+    float: right;
+    width: 10px;
+   /*margin-right: 20px;*/
+    position: relative;
+}
+
+#page_options .dropdown{float: right;}
+
+.date-picker-wrapper{
+    background-color: #fff;
+    color: inherit;
+}
+.date-picker-wrapper .month-wrapper{
+    border: none;
+}
+.date-picker-wrapper table thead{
+    background: none;
+}
+.date-picker-wrapper table thead th{
+    font-weight: bold;
+    min-width: 30px;
+}
+.date-picker-wrapper table .caption .next, .date-picker-wrapper table .caption .prev{
+    color: #03A9F4;
+}
+.date-picker-wrapper table tr{
+    background: none !important;
+}
+.date-picker-wrapper .month-wrapper table td{
+    border: 1px solid #ECEFF1;
+}
+.date-picker-wrapper .month-wrapper table td:empty{
+    border: 0;
+}
+.date-picker-wrapper .month-wrapper table{
+    border-collapse: collapse;
+    empty-cells: hide;
+}
+.date-picker-wrapper .first-date-selected, .date-picker-wrapper .last-date-selected{
+    background-color: #03A9F4 !important;
+}
+ 
+
+.logout{
+    /*border-right: 1px solid #7abdff; */
+}       
+
+.blank_space{
+    border-left: none !important;
+    width: 40% !important;
+}
+.eto_logo{
+   padding: 5px !important;
+  /* margin-left: 45% !important;*/
+   border-left: 0px !important;
+   border-right: 1px solid #7abdff !important;
+   height: 60px !important;
+}
+/* ETO Job Constraints */
+.eto-job-cons-days-hid {
+    display: none;
+}
+
+.eto-job-cons-display-days {
+    cursor: pointer;
+}
+
+#eto-job-cons-table tr td {
+    text-align: center;
+    vertical-align: middle;
+}
+#eto-job-cons-table tr td div {
+    float: left;
+    margin: 0 auto;
+    padding: 0;
+    width: 100%;
+}
+#eto-job-cons-table tr td div input {
+    float: none;
+    margin: 0 auto;
+}
+
+.icon-pencil{cursor: pointer;}
+.icon-play-circle{cursor: pointer; color: #2f3d54;}
+.icon-play-circle:hover{cursor: pointer; color: #03a9f4;}
+.dataTable .icon-refresh{cursor: pointer; color: #2f3d54;}
+table .icon-refresh:hover{cursor: pointer; color: #03a9f4;}
+
+.ajax_message{
+    text-align: center;
+}
+
+#default_timezone{
+    background: #03a9f4;
+    border: none;
+    color: #fff;
+    margin-bottom: 0px !important;
+}
+
+.total_row, .total_row:hover{
+  background-color: #2f3d54;
+  color: #fff;
+  font-weight: bold;
+}
+
+input[type=week]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    display: none;
+}
+
+#reset_button{
+    /*width: 10%;*/
+    height:28px;
+    background-color: #2f3d54;
+    color:#ffffff;
+    border:0;
+    float: left;
+    margin-left: 7%;
+    border-radius: 5px;
+}
+
+#reset_button:hover{
+	background-color: #03a9f4;
+}
+
+/*CSS for loading image start*/
+#loadingDiv {
+  position:fixed;
+  top:0px;
+  right:0px;
+  width:100%;
+  height:100%;
+  background-color: rgba(0,0,0,0.3);
+  background-image:url('../img/loading.gif');
+  background-repeat:no-repeat;
+  background-position:center;
+  z-index:1000000;
+}
+/*CSS for loading image ends*/
+
+/*Override bootstrap dropdown menu*/
+ul.dropdown-menu{ left: auto !important; right: 0 !important; }
+/*ul.dropdown-menu li { text-align: right; }*/
+
+.table th, .table td{text-align: center;}
+/*CSS for loading image ends*/
+
+.job-processing-status-hide {
+  display: none;
+}
+
+.numberGroupIcon{cursor:pointer; float: left;}
+
+.eto-processing-number-border-right {
+    border-right: none !important;
+}
+
+.eto-processing-number-border-left {
+    border-left: none !important;
+}
+
+.my-form-control {
+    width: 60px;
+}
+
+.country_col{
+    border-left: none !important;
+    text-align: left !important;
+}
+
+.country_row_highlight{background-color: #47b5ff !important; color: #ffffff !important;}
+#slaTable > tbody > tr > td:first-child{padding: 2px 5px;}
+#slaTable > tbody > tr[class^='timerange_row'] > td:nth-child(2){text-align: left !important; color: #47b5ff; border-left: none;}
+#popup_box{
+    background-color: #fff;
+    position: absolute;
+    z-index: 1000;
+    display: none;
+    border-radius: 5px;
+    box-shadow: 0px 0px 20px #666;
+    max-height: 15%;
+    width: 25%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.country_col_arrow{text-align: center !important; border-left: none !important;}
+
+.popup_cell{
+    color: #47b5ff;
+    font-weight: bold;
+}
+
+.welcome{
+    padding: 9px 10px !important;
+    display: block;
+    color: #fff;
+    border-left: 0px !important;
+}
+
+.viewall{
+    width: 100% !important;
+    background-color: #03a9f4;
+    color: #fff;
+    border: none;
+}
+
+.caret{
+    border-top-color: #fff !important;
+}
+
+.dropdown-toggle{
+    background-color: #2f3d54 !important;
+    border-radius: 5px !important;
+}
+
+.toggleAll{padding: 2px !important;}
+
+/* User image */
+.userIcon {
+    font-size: 16px;
+    border: 1px solid #FFF;
+    padding-top: 5px;
+    width: 30px;
+    height: 25px;
+    border-radius: 50%;
+    vertical-align: middle;
+    text-transform: uppercase;
+    text-align: center;
+    margin-right: 5px;
+    color: #FFF;
+    display: inline-block;
+}
+
+
+
+.userIcon1 {
+    background-color: #EF6C00;
+}
+
+.userIcon2 {
+    background-color: #5C6BC0;
+}
+
+.userIcon3 {
+    background-color: #AB47BC;
+}
+
+.userIcon4 {
+    background-color: #C2195B;
+}
+
+.userIcon5 {
+    background-color: #19579B;
+}
+
+.userIcon6 {
+    background-color: #5D4037;
+}
+
+.userIcon7 {
+    background-color: #455A63;
+}
+
+.userIcon8 {
+    background-color: #A0C3FF;
+}
+
+.userIcon9 {
+    background-color: #19579B;
+}
+
+.userIcon10 {
+    background-color: #FAC505;
+}
+
+.userIcon11 {
+    background-color: #33691F;
+}
+
+.userIcon12 {
+    background-color: #7FC8AF;
+}
+
+.copyright{
+    color: #fff;
+    text-align: center;
+    border-bottom: 0px !important;
+    list-style-type: none;
+}
+
+.copyright-inner-div{
+    height: 20px;
+}
+
+.footer{
+    width: 220px;
+    bottom: 20px;
+    height: 80px;
+    position: fixed;
+}
+
+.footer ul{
+    margin: 0px !important;
+}
+
+.contact{
+    cursor: pointer;
+    color: #fff !important;
+    font-size: 18px !important;
+}
+
+.contact:hover{
+    color: #2f3d54 !important;
+}
+
+/*Css for showing button as link*/
+button.link {
+    -moz-user-select: text;
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    /*text-align: right;*/
+}
+
+.dropdown-menu > li > button.link {
+    padding: 3px 10px;
+    color: #fff;
+    font-size: 12px;
+    clear: both;
+    font-weight: normal;
+    font-family: 'montserrat';
+    white-space: nowrap;
+    display: block;
+    width: 100%;
+    text-align:left;
+}
+
+.dropdown-menu > li > button.link:hover { background: #03A9F4 !important; }
+.dropdown-menu > li > a:hover { background: #03A9F4 !important; }
+.dropdown-menu > li > button > i { padding-right: 8px; }
+#page_options .dropdown-menu{min-width: auto !important; border-radius: 7px; background-color: #2f3d54; border: 1px solid #03a9F3;}
+
+.reporting_dropdown, .job_dropdown{
+    width: 200px !important;
+}
+.reporting_dropdown .btn, .job_dropdown .btn{
+    font-size: 14px !important;
+    width: 100% !important;
+    text-align: left;
+    background-color: #2f3d54;
+    color: #fff;
+    border-bottom: 0px !important;
+    text-shadow: none !important;
+}
+
+.reporting_dropdown .btn:hover{
+    background-color: #03A9F4;
+    color: #fff;
+}
+
+
+.pdf_title{
+    background-color: #03A9F4 !important;
+    color: #fff !important;
+}
+
+.pdf_head{
+    background-color: #2f3d54 !important;
+    color: #fff !important;
+    font-size: 16px !important;
+}
+
+.pdf_body{
+    min-width:100px;
+    font-size: 16px !important;
+}
+
+.pdf_total{
+    background-color: #2f3d54 !important;
+    color: #fff !important;
+    font-size: 16px !important;
+}
+
+.pdf_foot{
+    position: absolute;
+    background-color: #03A9F4 !important;
+    color: #fff !important;
+    bottom: 0px;
+    width: 100% !important;
+}
+
+.pdf_foot h4{
+    color: #fff !important;
+    width: 100%;
+}
+.pdf_error{
+    background-color: #f74d4d !important;
+    color: #fff !important;
+    font-size: 16px !important;
+}
+
+.pdf_warning{
+    background-color: #ffbc00 !important;
+    color: #fff !important;
+    font-size: 16px !important;
+}
+
+.pdf_good{
+    background-color: #8BC34A !important;
+    color: #fff !important;
+    font-size: 16px !important;
+}
+
+.btn:hover, .btn-primary:hover{
+    background-color: #03A9F4 !important;
+}
+
+.submenu{
+    cursor: pointer;
+}
+
+i{
+    font-size: 16px;
+}
+
+.icon-pencil{
+    color: #fff;
+} 
+
+.dataTable .icon-pencil{
+    color: #666 !important;
+}
+
+.icon-trash{
+    color: #f74d4d !important;
+}
+
+.fp_number{
+    text-align: left !important;
+    border-left: 0px !important;
+}
+
+.modal fieldset div label{
+    display: inline-block;
+    text-align: right;
+    /* width: 140px; */
+    margin-right: 20px;
+    font-size: 16px;
+    /* font-weight: bold; */
+    color: #37474F;
+}
+
+
+.modal form button[type="submit"]{
+    margin-left: 50%;
+    background-color: #2f3d54;
+    border: 0px;
+    color: #fff;
+    border-radius: 5px;
+    width: 30%;
+    height: 40px;
+    float: left;
+}
+
+form button[type="submit"]:hover{
+    background-color: #03a9f4;
+}
+
+
+#call_start_time, #filter_date_range, #filter_weeknumber, .customDateTimeRangePicker{
+    width: 100%;
+}
+
+.file label{
+    text-align: center !important;
+}
+
+
+#add_job{
+    width: 120px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+
+#form-wizard fieldset{
+    text-align: left !important;
+}
+
+#page_options .dropdown-menu{
+    min-width: auto !important; 
+    background-color: #2f3d54;
+    border-radius: 5px;}
+
+hr.tr-separator {
+    height: 1px;
+    background-color: #123455;
+    border: none;
+}
+
+
+#contact_support_window {
+    display:none;
+    bottom: 0;
+    left: 0;
+    margin-left: 10%;
+    margin-top: 40%;
+    width: 100px;
+}
+
+
+.support-info{
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.support-info span, .support-info a{
+    font-size: 12px;
+    color: #798d96;
+}
+
+.support-info a{
+    text-decoration: none;
+}
+
+.support-info span:first-child{
+    font-weight: bold;
+    color: #263238;
+}
+
+.support-info i{
+    display: inline-block;
+    border-radius: 14px;
+    color: #03A9F4;
+    margin-right: 5px;
+}
+
+.support-info i.fa-envelope-o{
+    padding: 6px 4px;
+}
+
+.support-info i.fa-phone{
+    padding: 6px;
+}
+
+.support-email, .support-phone{
+    text-align: left;
+    display: inline-flex;
+    align-items: center;
+    margin-right: 10%; 
+    margin-left: 20px;
+}
+
+#contactModal fieldset{
+    margin-right: 3%;
+    text-align: left !important;
+}
+
+#contactModal select{
+    width: 100%;
+}
+
+#contactModal input, #contactModal textarea{
+    width: 97%;
+    resize: none;
+}
+
+#email_support{
+    float: none !important;
+    width: 30% !important;
+    margin-left: 35%;
+}
+
+.contactBox{
+    margin-right: 0% !important;
+}
+
+.datepicker table tr.week:hover{
+    background: #eee;
+}
+
+.datepicker table tr.week-active,
+.datepicker table tr.week-active td,
+.datepicker table tr.week-active td:hover,
+.datepicker table tr.week-active.week td,
+.datepicker table tr.week-active.week td:hover,
+.datepicker table tr.week-active.week,
+.datepicker table tr.week-active:hover{
+    background-color: #03a9f4;
+    background-image: -moz-linear-gradient(top, #0088cc, #0044cc);
+    background-image: -ms-linear-gradient(top, #0088cc, #0044cc);
+    background-image: -o-linear-gradient(top, #0088cc, #0044cc);
+    background-image: linear-gradient(top, #0088cc, #0044cc);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0088cc', endColorstr='#0044cc', GradientType=0);
+    border-color: #0044cc #0044cc #002a80;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+    color: #fff;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.widerFilter{
+    width: 10% !important;
+}
+
+.icon-signal{
+	color: #fff;
+}
+
+.icon-adjust{
+	color: #fff;
+}
+
+.icon-file-download{
+	color: #fff;
+}
+
+.call_description_fieldset{
+    text-align: center;
+}
+
+.searchBoxFilter{ width: 90% }
+
+
+.country_code{
+    display: none;
+}
+
+#status {
+    bottom: 0;
+}
+
+.total_row{
+    background-color: #2f3d54;
+    color: #fff;
+}
+
+#currency_conversion_bar{
+    border-top: 1px solid #7abdff;
+    color:#fff;
+    background-color: #2f3d54;
+}
+
+#currency_list{
+    list-style: none;
+}
+
+#currency_conversion_bar input[class^="currency_rate"] {
+    background-color: #03A9F4;
+    color: #fff;
+    border: none;
+ }
+
+.editable input{
+	height: 20px;
+	margin: 0;
+	width: 206px;
+}
+span.editable{
+	display: inline-block;
+	width: 210px;
+	height: 26px;
+}
+
+#editModal .modal-body{
+    margin-right: 20%;
+}
+
+.charts .widget-box{
+    border-left: 1px solid #cdcdcd;
+    width: 100%
+}
+
+#chart_div{
+    height: 25em;
+    display: flex;
+    width: 83%;
+}
+
+#piechart-container .widget-content .pie{
+    height: 350px;
+    margin-left: 10%;
+}
+
+#barchart-container{
+    display:flex;
+    width: 100%;
+    background: white;
+}
+
+#container {
+    position: relative;
+    width: 11%;
+    height: 100%;
+    margin: auto;
+    text-align: center;
+}
+
+.totalBox{
+    height: 7em;
+    text-align: center;
+    margin: 0 auto;
+    flex-direction: column;
+    justify-content: center;
+    margin-bottom: 10px;
+    display: flex;
+    color: white;
+}
+
+.header{
+    position: relative;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 1%;
+    font-size: 15px;
+}
+
+.totalValue{
+    font-size:25px;
+    font-style:italic;
+}
+
+#revenueBox{
+    background-color: #03a9f4;
+}
+
+#testsBox{
+    background-color: green;
+}
+
+#minCommitBox {
+    background-color: orange;
+}
+
+#piechart-container{
+    display:flex;
+    width: 100%
+}
+
+#piechart-container .widget-box{
+    display:inline-block;
+    margin: 0 auto;
+    padding: 0px 5px;
+    width: 100%;
+    border-top: none;
+    border-left: none;
+}
+
+#piechart-container .widget-content{
+    padding: 1px;
+    border-bottom: 1px solid #cdcdcd;
+    border-right: 1px solid #cdcdcd;
+    border-left: 1px solid #cdcdcd;
+}
+
+.download{
+    float:right;
+    background-color: #2f3d54;
+    color:#ffffff;
+    border:0;
+    float: left;
+    border-radius: 5px;
+    padding: 9px 10px 7px 11px; 
+}
+
+.tooltip-layout{
+    font-family: 'arial';
+    font-size: 13px;
+}
+
+.tooltip-layout b{
+    margin-left: 8px;
+}
+
+.tooltip-summary{
+    float:left;
+    width: 10px;
+    height: 10px;
+    margin: 5px;
+    border: 1px solid black;
+}
+
+#revenue-background{
+    background: #03A9F4;
+}
+
+#billableCalls-background{
+    background: green;
+}
+
+#minCommitment-background{
+    background: orange;
+}

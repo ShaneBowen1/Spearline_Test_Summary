@@ -39,6 +39,27 @@ class SummaryHourlyTable extends Table
             'foreignKey' => 'company_id',
             'joinType' => 'INNER'
         ]);
+
+        // Add the behaviour to your table
+        $this->addBehavior('Search.Search');
+
+        // Setup search filter using search manager
+        $this->searchManager()
+            ->add('date', 'Search.Callback', [
+                'callback' => function ($query, $args, $filter) {
+                    if($args['date'] === 'NULL') {
+                        $query->where(['SummaryHourly.hour_timestamp IS ' => null, 'SummaryHourly.hour_timestamp IS ' => null]);
+                    } else {
+                        $dates = json_decode($args['date']);
+                        if (!empty($dates)) {
+                            $query->where(['SummaryHourly.hour_timestamp >=' => $dates->start . ' 00:00:00', 'SummaryHourly.hour_timestamp < ' => $dates->end . ' 23:59:59']);
+                        }
+                        else{
+                            $query->where(['SummaryHourly.hour_timestamp >=' => date('Y-m-01 00:00:00', strtotime("-1 month")), 'SummaryHourly.hour_timestamp < ' => date('Y-m-t 23:59:59', strtotime("-1 month"))]);
+                        }
+                    }
+                }
+            ]);
     }
 
     /**
@@ -77,5 +98,15 @@ class SummaryHourlyTable extends Table
         $rules->add($rules->existsIn(['company_id'], 'Company'));
 
         return $rules;
+    }
+    public function getFilters()
+    {
+        $dates = $this->find('list', ['keyField' => '','valueField' => 'hour_timestamp'])->distinct(['hour_timestamp'])->hydrate(false)->toArray();
+        foreach($dates as $date){
+            $d[$date->format('Y-m')] = $date->format('M, Y');
+        }
+        $result['date'] = ['options' => $d, 'label' => false, 'data-placeholder' => 'Date'];
+        
+        return $result;
     }
 }
