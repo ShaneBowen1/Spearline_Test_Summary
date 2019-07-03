@@ -153,11 +153,16 @@ class SummaryHourlyController extends AppController
             ->group(['hour_timestamp'])
             ->toArray();
 
+        $totalTests = $this->SummaryHourly->find('all')
+            ->SELECT(['hour_timestamp'=>'hour_timestamp', 'company_id'=>'company_id', 'total'=>'(total_pstn_calls + total_gsm_calls)'])
+            ->where(['hour_timestamp >=' => $startDate, 'hour_timestamp < ' => $endDate, 'company_id IN (1, 2, 3, 4, 6)'])
+            ->group(['hour_timestamp', 'company_id'])
+            ->toArray();
+
         $filters = $this->SummaryHourly->getFilters();
 
-        $this->set(compact('summaryHourly', 'totalTestsBreakdown' , 'filters', 'drStartDate', 'drEndDate'));
+        $this->set(compact('summaryHourly', 'totalTestsBreakdown', 'totalTests', 'filters', 'drStartDate', 'drEndDate'));
     }
-
 
     public function individualCompanyTests()
     {

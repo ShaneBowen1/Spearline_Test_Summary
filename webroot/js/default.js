@@ -433,22 +433,100 @@ $( window ).load(function() {
 //Charts
 $(document).ready(function(){
     var total_tests_breakdown = JSON.parse($('#total_tests_breakdown').val());
+    var total_tests = JSON.parse($('#total_tests').val());
     console.log(total_tests_breakdown)
+    console.log(total_tests)
 
     google.charts.load('current', {'packages':['corechart']});
+
+    // google.charts.setOnLoadCallback(drawLineChart);
     google.charts.setOnLoadCallback(drawChart);
+
+    // function drawChart() {
+    //     var data = new google.visualization.DataTable();
+
+    //     data.addColumn('number', 'Date');
+    //     data.addColumn('number', 'Total PSTN Calls');
+    //     data.addColumn('number', 'Total GSM Calls');
+
+    //     var ticks = [];
+    //     for(var i=0; i<total_tests_breakdown.length; i++){
+    //         var d = new Date()
+    //         d = new Date(total_tests_breakdown[i]['hour_timestamp'])
+    //         d.setHours(d.getHours() - 1);
+
+    //         var hours = ("0" + d.getHours()).slice(-2);
+    //         var minutes = ("0" + d.getMinutes()).slice(-2)
+    //         var seconds = ("0" + d.getSeconds()).slice(-2)
+
+    //         var day = d.getDate();
+    //         var month = d.toLocaleString('en-us', { month: 'short' });
+    //         var year = d.getFullYear();
+            
+    //         ticks.push({
+    //             v: i,
+    //             f: day + ' ' + month + ' ' + year + ' ' + hours + ':' + minutes + ':' + seconds
+    //         });
+
+    //         data.addRow(
+    //             [{v: i, f: day + ' ' + month + ' ' + year + ' ' + hours + ':' + minutes + ':' + seconds}, parseFloat(total_tests_breakdown[i]['total_pstn_calls']), parseFloat(total_tests_breakdown[i]['total_gsm_calls'])]
+    //         );
+    //     }
+            
+    //     var options = {
+    //         title: 'Summary Hourly',
+    //         curveType: 'function',
+    //         legend: { position: 'top' },
+    //         // pointSize: 1,
+    //         hAxis: {
+    //             title: 'Hour Timestamp',
+    //             ticks: ticks,
+    //             viewWindowMode: "explicit", viewWindow:{ min: 0 },
+    //             gridlines: {
+    //                 count: 4
+    //             },
+    //         },
+    //         hAxes: {
+    //             gridlines: {
+    //                 count: 4
+    //             },
+    //         },
+    //         vAxis: {
+    //             title: 'Total Tests',
+    //             viewWindowMode: "explicit", viewWindow:{ min: 0 },
+    //             gridlines: {
+    //                 count: 4
+    //             },
+    //             // minorGridlines: { count: 0 }
+    //         }
+    //     };
+
+    //     var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+    //     chart.draw(data, options);
+    // }
 
     function drawChart() {
         var data = new google.visualization.DataTable();
-
         data.addColumn('number', 'Date');
-        data.addColumn('number', 'Total PSTN Calls');
-        data.addColumn('number', 'Total GSM Calls');
+        // data.addColumn('number', 'Total');
 
+        columns = ['hour_timestamp']
+        for(var i=0; i<total_tests.length; i++){
+            if(columns.indexOf(total_tests[i]['company_id']) == -1){ 
+                columns.push(total_tests[i]['company_id']) 
+                data.addColumn('number', total_tests[i]['company_id'])
+            }
+            else{
+                console.log("This item already exists");
+            }
+        }
+
+        var values = [];
         var ticks = [];
-        for(var i=0; i<total_tests_breakdown.length; i++){
+        for(var i=0; i<total_tests.length; i++){
+            console.log(total_tests[i])
             var d = new Date()
-            d = new Date(total_tests_breakdown[i]['hour_timestamp'])
+            d = new Date(total_tests[i]['hour_timestamp'])
             d.setHours(d.getHours() - 1);
 
             var hours = ("0" + d.getHours()).slice(-2);
@@ -458,48 +536,39 @@ $(document).ready(function(){
             var day = d.getDate();
             var month = d.toLocaleString('en-us', { month: 'short' });
             var year = d.getFullYear();
+
+            if(values.length == 0){
+                values = [{v: i, f: day + ' ' + month + ' ' + year + ' ' + hours + ':' + minutes + ':' + seconds}]
+            }
             
             ticks.push({
                 v: i,
                 f: day + ' ' + month + ' ' + year + ' ' + hours + ':' + minutes + ':' + seconds
             });
+            values.push(parseFloat(total_tests[i]['total']))
 
-            data.addRow(
-                [{v: i, f: day + ' ' + month + ' ' + year + ' ' + hours + ':' + minutes + ':' + seconds}, parseFloat(total_tests_breakdown[i]['total_pstn_calls']), parseFloat(total_tests_breakdown[i]['total_gsm_calls'])]
-            );
-        }
-            
-        var options = {
-            title: 'Summary Hourly',
-            curveType: 'function',
-            legend: { position: 'top' },
-            hAxis: {
-                title: 'Hour Timestamp',
-                ticks: ticks,
-                viewWindowMode: "explicit", viewWindow:{ min: 0 },
-                gridlines: {
-                    count: 4
-                },
-            },
-            hAxes: {
-                gridlines: {
-                    count: 4
-                },
-            },
-            vAxis: {
-                title: 'Total Tests',
-                viewWindowMode: "explicit", viewWindow:{ min: 0 },
-                gridlines: {
-                    count: 4
-                },
-                // minorGridlines: { count: 0 }
+            console.log(values.length)
+            console.log(columns.length)
+
+            if(values.length == columns.length){
+                console.log('Row Added');
+                data.addRow(values);
+                values = [];
             }
-        };
+        }
+        
+        var options = {
+            title: 'Overall Tests',
+            hAxis: {title: 'Hour Timestamp', ticks: ticks,  titleTextStyle: {color: '#333'}},
+            vAxis: {title: 'Total Tests', minValue: 0},
+            pointSize: 3,
+            isStacked: true
+          };
 
-        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+        var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
         chart.draw(data, options);
-      }
-
+    }
+    
     /*Submit form on selecting second date*/
     $('.customDateTimeRangePicker').daterangepicker({
         initialText: 'Date Range',

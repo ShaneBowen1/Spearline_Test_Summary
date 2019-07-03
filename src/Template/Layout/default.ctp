@@ -13,12 +13,12 @@
  * @license       https://opensource.org/licenses/mit-license.php MIT License
  */
 
-$cakeDescription = 'CakePHP: the rapid development php framework';
+$title = 'Spearline Test Summary';
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-<?= $this->Html->charset() ?>
+    <?= $this->Html->charset() ?>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:100,300,400,600, 700" rel="stylesheet">
     <title>
@@ -95,7 +95,7 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
     <?= $this->Html->css('font-awesome.css') ?>
     <?= $this->Html->css('jquery.easy-pie-chart.css') ?>
     <?= $this->Html->css('jquery.gritter.css') ?>
-    <!-- <?= $this->Html->css('matrix-media.css') ?> -->
+    <?= $this->Html->css('matrix-media.css') ?>
     <?= $this->Html->css('matrix-style.css') ?>
     <?= $this->Html->css('select2.css') ?>
     <?= $this->Html->css('uniform.css') ?>
@@ -112,24 +112,71 @@ $cakeDescription = 'CakePHP: the rapid development php framework';
     <?= $this->Flash->render() ?>
 </head>
 <body>
-    <nav class="top-bar expanded" data-topbar role="navigation">
-        <ul class="title-area large-3 medium-4 columns">
-            <li class="name">
-                <h1><a href=""><?= $this->fetch('title') ?></a></h1>
+    <!--Header-part-->
+<div id="header">
+  <h1><a href="dashboard.html"></a></h1>
+</div>
+<!--close-Header-part-->
+
+
+<!--top-Header-menu-->
+<div id="user-nav" class="navbar navbar-inverse">
+  <ul class="nav">
+    <li class="welcome"><i class="icon icon-user"></i>Welcome</li>
+    <li class="logout"><?php echo $this->Html->link('<i class="icon icon-share-alt"></i> <span class="text">Logout</span>', [ 'controller' => 'User','action' => 'logout'], ['escape' => false]);?></li>
+  </ul>
+</div>
+<!--close-top-Header-menu-->
+
+<!--sidebar-menu-->
+<div class='footer main_footer'>
+    <ul>
+        <li class="copyright" style="font-size: 16px">
+            <?= $this->Form->button("<i class='icon-envelope-alt'></i>".__('Contact support'), ['type' => 'button', 'class'=>'btn btn-primary link contact', 'data-href'=>$this->Url->build(["controller" => "Contact", "action" => "index"])]) ?>
+        </li>
+        <li class="copyright"> 
+            <div class="copyright-inner-div"><span>&copy;<?php echo date('Y');?> Spearline</span></div>
+            <div><span>All Rights Reserved.</span></div>
+        </li>
+    </ul>
+    
+</div>
+
+<div id="loadingDiv" style="display: none;"></div>
+<!-- Contact Us Modal -->
+<div id="contactModal" class="modal fade" role="dialog" style="display:none;">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Contact support</h4>
+      </div>
+      <div class="modal-body"> 
+      </div>   
+      <div class="modal-footer">
+        <!--<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>-->
+        <p class='ajax_message'></p>
+      </div>
+    </div>
+  </div>
+</div>
+<!--sidebar-menu-->
+
+<!--main-container-part-->
+<div class="content-default">
+  <?= $this->fetch('content') ?>
+</div>
+<div class='footer child_footer' hidden>
+        <ul>
+            <li class="copyright" style="font-size: 16px">
+                <?= $this->Form->button("<i class='icon-envelope'></i>".__('Contact support'), ['type' => 'button', 'class'=>'btn btn-primary link contact', 'data-href'=>$this->Url->build(["controller" => "Contact", "action" => "index"])]) ?>
+            </li>
+            <li class="copyright"> 
+                <div class="copyright-inner-div"><span>&copy;<?php echo date('Y');?> Spearline</span></div>
+                <div><span>All Rights Reserved.</span></div>
             </li>
         </ul>
-        <div class="top-bar-section">
-            <ul class="right">
-                <li><a target="_blank" href="https://book.cakephp.org/3.0/">Documentation</a></li>
-                <li><a target="_blank" href="https://api.cakephp.org/3.0/">API</a></li>
-            </ul>
-        </div>
-    </nav>
-    <?= $this->Flash->render() ?>
-    <div class="container clearfix">
-        <?= $this->fetch('content') ?>
     </div>
-    <footer>
-    </footer>
 </body>
 </html>
