@@ -121,6 +121,9 @@ class SummaryHourlyController extends AppController
     public function overallTests()
     {
         $summaryHourly = $this->paginate($this->SummaryHourly);
+
+        #Load Test Type Model
+        $this->loadModel('Company');
         
         /*If no daterange selected in filter then show results for current week only*/
         if(empty($this->request->query['date'])){
@@ -153,15 +156,19 @@ class SummaryHourlyController extends AppController
             ->group(['hour_timestamp'])
             ->toArray();
 
-        $totalTests = $this->SummaryHourly->find('all')
+        $companyBreakdown = $this->SummaryHourly->find('all')
             ->SELECT(['hour_timestamp'=>'hour_timestamp', 'company_id'=>'company_id', 'total'=>'(total_pstn_calls + total_gsm_calls)'])
-            ->where(['hour_timestamp >=' => $startDate, 'hour_timestamp < ' => $endDate, 'company_id IN (1, 2, 3, 4, 6)'])
+            ->where(['hour_timestamp >=' => $startDate, 'hour_timestamp < ' => $endDate])
             ->group(['hour_timestamp', 'company_id'])
+            ->toArray();
+
+        $companyNames = $this->Company->find('all')
+            ->SELECT(['id'=>'id', 'name'=>'name'])
             ->toArray();
 
         $filters = $this->SummaryHourly->getFilters();
 
-        $this->set(compact('summaryHourly', 'totalTestsBreakdown', 'totalTests', 'filters', 'drStartDate', 'drEndDate'));
+        $this->set(compact('summaryHourly', 'totalTestsBreakdown', 'companyBreakdown', 'companyNames', 'filters', 'drStartDate', 'drEndDate'));
     }
 
     public function individualCompanyTests()

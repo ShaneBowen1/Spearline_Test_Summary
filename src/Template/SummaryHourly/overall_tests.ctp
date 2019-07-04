@@ -5,7 +5,8 @@
  */
 ?>
 <?= $this->Form->hidden('total_tests_breakdown',['id'=>'total_tests_breakdown', 'value'=>json_encode($totalTestsBreakdown)]) ?>
-<?= $this->Form->hidden('total_tests',['id'=>'total_tests', 'value'=>json_encode($totalTests)]) ?>
+<?= $this->Form->hidden('company_breakdown',['id'=>'company_breakdown', 'value'=>json_encode($companyBreakdown)]) ?>
+<?= $this->Form->hidden('company_names',['id'=>'company_names', 'value'=>json_encode($companyNames)]) ?>
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="span12">
