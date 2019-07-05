@@ -7,6 +7,10 @@
 <?= $this->Form->hidden('total_tests_breakdown',['id'=>'total_tests_breakdown', 'value'=>json_encode($totalTestsBreakdown)]) ?>
 <?= $this->Form->hidden('company_breakdown',['id'=>'company_breakdown', 'value'=>json_encode($companyBreakdown)]) ?>
 <?= $this->Form->hidden('company_names',['id'=>'company_names', 'value'=>json_encode($companyNames)]) ?>
+<?= $this->Form->hidden('total_tests',['id'=>'total_tests', 'value'=>json_encode($totalTests)]) ?>
+<?= $this->Form->hidden('total_pstn',['id'=>'total_pstn', 'value'=>json_encode($totalPSTN)]) ?>
+<?= $this->Form->hidden('total_gsm',['id'=>'total_gsm', 'value'=>json_encode($totalGSM)]) ?>
+<?= $this->Form->hidden('avg_tests',['id'=>'avg_tests', 'value'=>json_encode($avgTests)]) ?>
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="span12">
@@ -73,7 +77,13 @@
             <div class="widget-content">
                 <div id="barchart-container">
                     <body>
-                        <div id="chart_div" style="width: 1800px; height: 600px"></div>
+                        <div id="chart_div" style="width: 1800px; height: 600px; z-index: 2;"></div>
+                        <div class="overlay">
+                            <div style="font-family:'Arial Black'; font-size: 16px; margin-right: 15px">Total Tests: <?= number_format($totalTests) ?></div>
+                            <div style="font-family:'Arial Black'; font-size: 16px; margin-right: 15px">Total PSTN: <?= number_format($totalPSTN) ?></div>
+                            <div style="font-family:'Arial Black'; font-size: 16px; margin-right: 15px">Total GSM: <?= number_format($totalGSM) ?></div>
+                            <div style="font-family:'Arial Black'; font-size: 16px;">Avg Tests: <?= number_format($avgTests, 2) ?></div>
+                        </div>
                     </body>
                 </div>
             </div>

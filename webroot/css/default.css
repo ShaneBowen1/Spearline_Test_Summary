@@ -866,3 +866,18 @@ span.editable{
 #minCommitment-background{
     background: orange;
 }
+
+.overlay {
+    display: inline-flex;
+    /* width: 800px; */
+    /* height: 200px; */
+    position: absolute;
+    top: 20%;  /* chartArea top  */
+    right: 15%; /* chartArea right */
+    /* z-index:-1; */
+    z-index: 1;
+}
+
+.google-visualization-tooltip{
+    z-index: 1000;
+ }

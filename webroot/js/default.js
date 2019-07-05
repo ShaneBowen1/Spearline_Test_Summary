@@ -440,8 +440,6 @@ $(document).ready(function(){
     console.log(company_names)
 
     google.charts.load('current', {'packages':['corechart']});
-
-    // google.charts.setOnLoadCallback(drawLineChart);
     google.charts.setOnLoadCallback(drawChart);
 
     // function drawChart() {
@@ -561,14 +559,14 @@ $(document).ready(function(){
 
             values = [{v: index, f: day + ' ' + month + ' ' + year + ' ' + hours + ':' + minutes + ':' + seconds}]
             index += selectedCompanies.length
-            console.log(value);
+            // console.log(value);
 
             for(var i=0; i<value.length; i++){
                 currentCompanies.push(parseFloat(value[i]['company_id']))
                 totalTests +=parseFloat(value[i]['total'])
             }
-            console.log(currentCompanies);
-            console.log(selectedCompanies)
+            // console.log(currentCompanies);
+            // console.log(selectedCompanies)
 
             for(var i=0; i<selectedCompanies.length; i++){
                 if(currentCompanies.indexOf(selectedCompanies[i]) >= 0){
@@ -596,6 +594,7 @@ $(document).ready(function(){
             vAxis: {title: 'Total Tests', minValue: 0},
             pointSize: 3,
             isStacked: true,
+            backgroundColor:'transparent',
             // legend: {position: 'top'}
             // interpolateNulls: true
           };

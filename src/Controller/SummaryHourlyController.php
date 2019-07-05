@@ -166,9 +166,18 @@ class SummaryHourlyController extends AppController
             ->SELECT(['id'=>'id', 'name'=>'name'])
             ->toArray();
 
-        $filters = $this->SummaryHourly->getFilters();
+        $totalTests = 0;
+        $totalPSTN = 0;
+        $totalGSM = 0;
+        foreach($totalTestsBreakdown as $key => $value ){
+            $totalTests += $value->total_pstn_calls + $value->total_gsm_calls;
+            $totalPSTN += $value->total_pstn_calls;
+            $totalGSM += $value->total_gsm_calls;
+        }
+        $avgTests = $totalTests / sizeof($totalTestsBreakdown);
 
-        $this->set(compact('summaryHourly', 'totalTestsBreakdown', 'companyBreakdown', 'companyNames', 'filters', 'drStartDate', 'drEndDate'));
+        $filters = $this->SummaryHourly->getFilters();
+        $this->set(compact('summaryHourly', 'totalTestsBreakdown', 'companyBreakdown', 'companyNames', 'totalTests', 'totalPSTN', 'totalGSM', 'avgTests', 'filters', 'drStartDate', 'drEndDate'));
     }
 
     public function individualCompanyTests()
