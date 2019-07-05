@@ -24,7 +24,7 @@ class SummaryHourlyTableTest extends TestCase
      */
     public $fixtures = [
         'app.SummaryHourly',
-        'app.Companies'
+        'app.Company'
     ];
 
     /**
@@ -77,6 +77,16 @@ class SummaryHourlyTableTest extends TestCase
      * @return void
      */
     public function testBuildRules()
+    {
+        $this->markTestIncomplete('Not implemented yet.');
+    }
+
+    /**
+     * Test getFilters method
+     *
+     * @return void
+     */
+    public function testGetFilters()
     {
         $this->markTestIncomplete('Not implemented yet.');
     }

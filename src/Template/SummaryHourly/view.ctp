@@ -11,14 +11,20 @@
         <li><?= $this->Form->postLink(__('Delete Summary Hourly'), ['action' => 'delete', $summaryHourly->hour_timestamp, company_id], ['confirm' => __('Are you sure you want to delete # {0}?', $summaryHourly->hour_timestamp, company_id)]) ?> </li>
         <li><?= $this->Html->link(__('List Summary Hourly'), ['action' => 'index']) ?> </li>
         <li><?= $this->Html->link(__('New Summary Hourly'), ['action' => 'add']) ?> </li>
+        <li><?= $this->Html->link(__('List Company'), ['controller' => 'Company', 'action' => 'index']) ?> </li>
+        <li><?= $this->Html->link(__('New Company'), ['controller' => 'Company', 'action' => 'add']) ?> </li>
     </ul>
 </nav>
 <div class="summaryHourly view large-9 medium-8 columns content">
     <h3><?= h($summaryHourly->hour_timestamp, company_id) ?></h3>
     <table class="vertical-table">
         <tr>
-            <th scope="row"><?= __('Company Id') ?></th>
-            <td><?= $this->Number->format($summaryHourly->company_id) ?></td>
+            <th scope="row"><?= __('Company') ?></th>
+            <td><?= $summaryHourly->has('company') ? $this->Html->link($summaryHourly->company->name, ['controller' => 'Company', 'action' => 'view', $summaryHourly->company->id]) : '' ?></td>
+        </tr>
+        <tr>
+            <th scope="row"><?= __('Test Type Id') ?></th>
+            <td><?= $this->Number->format($summaryHourly->test_type_id) ?></td>
         </tr>
         <tr>
             <th scope="row"><?= __('Total Pstn Calls') ?></th>

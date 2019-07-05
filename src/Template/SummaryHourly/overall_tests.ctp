@@ -33,6 +33,7 @@
                         $value['options'] = ['' => ''] + $options_v ;
                         }
                     ?>
+                        <div class="span2 widerFilter"><?= $this->Form->input($key,$value); ?></div>
                     <?php
                     }
                     ?>

@@ -19,7 +19,7 @@ class SummaryHourlyControllerTest extends TestCase
      */
     public $fixtures = [
         'app.SummaryHourly',
-        'app.Companies'
+        'app.Company'
     ];
 
     /**

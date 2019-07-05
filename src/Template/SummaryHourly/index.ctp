@@ -8,6 +8,8 @@
     <ul class="side-nav">
         <li class="heading"><?= __('Actions') ?></li>
         <li><?= $this->Html->link(__('New Summary Hourly'), ['action' => 'add']) ?></li>
+        <li><?= $this->Html->link(__('List Company'), ['controller' => 'Company', 'action' => 'index']) ?></li>
+        <li><?= $this->Html->link(__('New Company'), ['controller' => 'Company', 'action' => 'add']) ?></li>
     </ul>
 </nav>
 <div class="summaryHourly index large-9 medium-8 columns content">
@@ -17,19 +19,27 @@
             <tr>
                 <th scope="col"><?= $this->Paginator->sort('hour_timestamp') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('company_id') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('test_type_id') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('total_pstn_calls') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('total_gsm_calls') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('updated') ?></th>
+                <th scope="col" class="actions"><?= __('Actions') ?></th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($summaryHourly as $summaryHourly): ?>
             <tr>
                 <td><?= h($summaryHourly->hour_timestamp) ?></td>
-                <td><?= $this->Number->format($summaryHourly->company_id) ?></td>
+                <td><?= $summaryHourly->has('company') ? $this->Html->link($summaryHourly->company->name, ['controller' => 'Company', 'action' => 'view', $summaryHourly->company->id]) : '' ?></td>
+                <td><?= $this->Number->format($summaryHourly->test_type_id) ?></td>
                 <td><?= $this->Number->format($summaryHourly->total_pstn_calls) ?></td>
                 <td><?= $this->Number->format($summaryHourly->total_gsm_calls) ?></td>
                 <td><?= h($summaryHourly->updated) ?></td>
+                <td class="actions">
+                    <?= $this->Html->link(__('View'), ['action' => 'view', $summaryHourly->hour_timestamp, company_id]) ?>
+                    <?= $this->Html->link(__('Edit'), ['action' => 'edit', $summaryHourly->hour_timestamp, company_id]) ?>
+                    <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $summaryHourly->hour_timestamp, company_id], ['confirm' => __('Are you sure you want to delete # {0}?', $summaryHourly->hour_timestamp, company_id)]) ?>
+                </td>
             </tr>
             <?php endforeach; ?>
         </tbody>

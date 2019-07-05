@@ -8,6 +8,7 @@ use Cake\ORM\Entity;
  *
  * @property \Cake\I18n\FrozenTime $hour_timestamp
  * @property int $company_id
+ * @property int $test_type_id
  * @property int $total_pstn_calls
  * @property int $total_gsm_calls
  * @property bool $updated
@@ -28,6 +29,7 @@ class SummaryHourly extends Entity
     protected $_accessible = [
         'hour_timestamp' => true,
         'company_id' => true,
+        'test_type_id' => true,
         'total_pstn_calls' => true,
         'total_gsm_calls' => true,
         'updated' => true,

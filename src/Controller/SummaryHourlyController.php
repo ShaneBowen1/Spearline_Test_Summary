@@ -12,6 +12,7 @@ use App\Controller\AppController;
  */
 class SummaryHourlyController extends AppController
 {
+
     public function initialize()
     {
         parent::initialize();
@@ -20,7 +21,7 @@ class SummaryHourlyController extends AppController
             'actions' => ['overallTests']
         ]);
     }
-
+    
     /**
      * Index method
      *
@@ -28,9 +29,9 @@ class SummaryHourlyController extends AppController
      */
     public function index()
     {
-        // $this->paginate = [
-        //     'contain' => ['Company']
-        // ];
+        $this->paginate = [
+            'contain' => ['Company']
+        ];
         $summaryHourly = $this->paginate($this->SummaryHourly);
 
         $this->set(compact('summaryHourly'));
@@ -46,7 +47,7 @@ class SummaryHourlyController extends AppController
     public function view($id = null)
     {
         $summaryHourly = $this->SummaryHourly->get($id, [
-            'contain' => ['Company', 'individualCompanyTests']
+            'contain' => ['Company']
         ]);
 
         $this->set('summaryHourly', $summaryHourly);
@@ -121,21 +122,20 @@ class SummaryHourlyController extends AppController
     public function overallTests()
     {
         $summaryHourly = $this->paginate($this->SummaryHourly);
-
-        #Load Test Type Model
+        #Load Models
         $this->loadModel('Company');
+        $this->loadModel('TestType');
         
         /*If no daterange selected in filter then show results for current week only*/
         if(empty($this->request->query['date'])){
             // $startDate = date('Y-m-d H:i:s', strtotime("-1 month"));
             // $endDate = date('Y-m-d H:i:s');
-            $startDate = date('Y-m-01 00:00:00', strtotime("-1 month"));
-            $endDate = date('Y-m-t 23:59:59', strtotime("-1 month"));
+            $startDate = date('Y-m-01 00:00:00', strtotime("-1 week"));
+            $endDate = date('Y-m-t 23:59:59', strtotime("-1 week"));
         $this->request->query['date'] = $startDate . " - ". $endDate;
         }else{
             /*If date range is selected then decode it*/
             $filter_date_range_decoded = json_decode($this->request->query['date']);
-
             /*If date range in query string contains start and end parameter then use them directly*/
             if(isset($filter_date_range_decoded->start) && isset($filter_date_range_decoded->end)){
                 $startDate =  $filter_date_range_decoded->start." 00:00:00";
@@ -149,23 +149,21 @@ class SummaryHourlyController extends AppController
         }
         $drStartDate = date('Y-m-d', strtotime($startDate));
         $drEndDate = date('Y-m-d', strtotime($endDate));
+        $diff = abs(strtotime($drStartDate) - strtotime($drEndDate));
+        $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24)) + 1;
+        debug($days);
 
-        $totalTestsBreakdown = $this->SummaryHourly->find('all')
+        $totalTestsBreakdown = $this->SummaryHourly->find('search', ['search' => $this->request->query])
             ->SELECT(['hour_timestamp'=>'hour_timestamp', 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
-            ->where(['hour_timestamp >=' => $startDate, 'hour_timestamp < ' => $endDate])
             ->group(['hour_timestamp'])
             ->toArray();
-
-        $companyBreakdown = $this->SummaryHourly->find('all')
-            ->SELECT(['hour_timestamp'=>'hour_timestamp', 'company_id'=>'company_id', 'total'=>'(total_pstn_calls + total_gsm_calls)'])
-            ->where(['hour_timestamp >=' => $startDate, 'hour_timestamp < ' => $endDate])
+        $companyBreakdown = $this->SummaryHourly->find('search', ['search' => $this->request->query])
+            ->SELECT(['hour_timestamp'=>'hour_timestamp', 'company_id'=>'company_id', 'total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
             ->group(['hour_timestamp', 'company_id'])
             ->toArray();
-
         $companyNames = $this->Company->find('all')
             ->SELECT(['id'=>'id', 'name'=>'name'])
             ->toArray();
-
         $totalTests = 0;
         $totalPSTN = 0;
         $totalGSM = 0;
@@ -174,7 +172,8 @@ class SummaryHourlyController extends AppController
             $totalPSTN += $value->total_pstn_calls;
             $totalGSM += $value->total_gsm_calls;
         }
-        $avgTests = $totalTests / sizeof($totalTestsBreakdown);
+
+        $avgTests = (sizeof($totalTestsBreakdown) > 0 ? $totalTests / sizeof($totalTestsBreakdown) : 0);
 
         $filters = $this->SummaryHourly->getFilters();
         $this->set(compact('summaryHourly', 'totalTestsBreakdown', 'companyBreakdown', 'companyNames', 'totalTests', 'totalPSTN', 'totalGSM', 'avgTests', 'filters', 'drStartDate', 'drEndDate'));
@@ -183,16 +182,13 @@ class SummaryHourlyController extends AppController
     public function individualCompanyTests()
     {
         $summaryHourly = $this->paginate($this->SummaryHourly);
-
         $startDate = date('Y-m-d H:i:s', strtotime("-1 week"));
         $endDate = date('Y-m-d H:i:s');
-
         $totalTestsBreakdown = $this->SummaryHourly->find('all')
             ->SELECT(['hour_timestamp'=>'hour_timestamp', 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
             ->where(['hour_timestamp >=' => $startDate, 'hour_timestamp < ' => $endDate])
             ->group(['hour_timestamp'])
             ->toArray();
-
         $this->set(compact('summaryHourly', 'totalTestsBreakdown'));
     }
 }

@@ -14,6 +14,8 @@
             )
         ?></li>
         <li><?= $this->Html->link(__('List Summary Hourly'), ['action' => 'index']) ?></li>
+        <li><?= $this->Html->link(__('List Company'), ['controller' => 'Company', 'action' => 'index']) ?></li>
+        <li><?= $this->Html->link(__('New Company'), ['controller' => 'Company', 'action' => 'add']) ?></li>
     </ul>
 </nav>
 <div class="summaryHourly form large-9 medium-8 columns content">
@@ -22,7 +24,8 @@
         <legend><?= __('Edit Summary Hourly') ?></legend>
         <?php
             echo $this->Form->control('hour_timestamp');
-            echo $this->Form->control('company_id');
+            echo $this->Form->control('company_id', ['options' => $company]);
+            echo $this->Form->control('test_type_id');
             echo $this->Form->control('total_pstn_calls');
             echo $this->Form->control('total_gsm_calls');
         ?>
