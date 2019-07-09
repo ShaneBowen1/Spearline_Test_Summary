@@ -1,0 +1,20 @@
+{
+  "name": "spearline_test_summary",
+  "homepage": "https://github.com/ShaneBowen1/Spearline_Test_Summary",
+  "authors": [
+    "ShaneBowen1 <48085979+ShaneBowen1@users.noreply.github.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "select2": "^4.0.7"
+  }
+}

@@ -506,6 +506,9 @@ $(document).ready(function(){
     // }
 
     function drawChart(){
+
+        const _ = require('lodash');
+
         var data = new google.visualization.DataTable();
         data.addColumn('number', 'Date');
 

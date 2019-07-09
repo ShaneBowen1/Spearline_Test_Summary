@@ -70,6 +70,12 @@ $title = 'Spearline Test Summary';
   <!--   <?= $this->Html->script('matrix.form_validation') ?>
     <?= $this->Html->script('matrix.interface') ?> -->
 
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.fp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/mapping.fp.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore-min.js"></script>
+
     <!-- js files for daterangepicker -->
     <?= $this->Html->script('jquery-ui-1.11.4.min') ?>
     <?= $this->Html->script('moment.min') ?>
