@@ -129,6 +129,10 @@ class SummaryHourlyController extends AppController
         $companyNames = $this->Company->find('all')
         ->SELECT(['id'=>'id', 'name'=>'name'])
         ->toArray();
+
+        $testTypes = $this->TestType->find('all')
+        ->SELECT(['id'=>'id', 'test_type'=>'test_type'])
+        ->toArray();
         
         /*If no daterange selected in filter then show results for current week only*/
         if(empty($this->request->query['date'])){
@@ -221,7 +225,7 @@ class SummaryHourlyController extends AppController
         $avgTests = (sizeof($totalTestsBreakdown) > 0 ? $totalTests / sizeof($totalTestsBreakdown) : 0);
 
         $filters = $this->SummaryHourly->getFilters();
-        $this->set(compact('summaryHourly', 'totalTestsBreakdown', 'companyBreakdown', 'companyNames', 'totalTests', 'totalPSTN', 'totalGSM', 'avgTests', 'filters', 'drStartDate', 'drEndDate'));
+        $this->set(compact('summaryHourly', 'totalTestsBreakdown', 'companyBreakdown', 'companyNames', 'totalTests', 'totalPSTN', 'totalGSM', 'avgTests', 'filters', 'drStartDate', 'drEndDate', 'testTypes'));
     }
 
     public function individualCompanyTests()

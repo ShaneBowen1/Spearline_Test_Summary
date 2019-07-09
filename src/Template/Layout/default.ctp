@@ -78,8 +78,9 @@ $title = 'Spearline Test Summary';
 
     <?= $this->Html->script('jquery.tablesorter') ?>
 
-
     <!--<?= $this->Html->script('bootstrap-datetimepicker.min') ?>-->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore-min.js"></script>
 
     <?= $this->Html->css('default.css') ?>
     <?= $this->Html->css('bootstrap-datetimepicker') ?>

@@ -118,8 +118,10 @@ class SummaryHourlyTable extends Table
     public function getFilters()
     {
         $testType = $this->TestType->find('list')->order(['id'=>'ASC']);
-        $result['test_type'] = ['type' => 'select', 'multiple' => true, 'options' => $testType, 'label' => false, 'data-placeholder' => 'Test type'];
         
+        // $result['test_type'] = ['type' => 'select', 'multiple' => true, 'options' => $testType, 'label' => false, 'data-placeholder' => 'Test type'];
+        $result['test_type'] = ['id' => 'testTypeSearch', 'class' => 'dropdown-search', 'type' => 'text', 'label' => false, 'onkeyup' => 'filterFunction()'];
+
         return $result;
     }
 }

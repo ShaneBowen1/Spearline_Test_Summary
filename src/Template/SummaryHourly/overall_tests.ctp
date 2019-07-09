@@ -11,6 +11,7 @@
 <?= $this->Form->hidden('total_pstn',['id'=>'total_pstn', 'value'=>json_encode($totalPSTN)]) ?>
 <?= $this->Form->hidden('total_gsm',['id'=>'total_gsm', 'value'=>json_encode($totalGSM)]) ?>
 <?= $this->Form->hidden('avg_tests',['id'=>'avg_tests', 'value'=>json_encode($avgTests)]) ?>
+<?= $this->Form->hidden('test_types',['id'=>'test_types', 'value'=>json_encode($testTypes)]) ?>
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="span12">
@@ -34,16 +35,25 @@
                         }
                     ?>
                         <div class="span2 widerFilter">
-                            <?= $this->Form->input($key,$value);?>
+                            <div class="dropdown-container">
+                                <div class="dropdown-button noselect">
+                                    <div class="dropdown-label">Test Types</div>
+                                    <div class="dropdown-quantity">(<span class="quantity">Any</span>)</div>
+                                </div>
+                                <div class="dropdown-list" style="display: none;">
+                                    <?= $this->Form->input($key, $value);?>
+                                    <ul class="test_types"></ul>
+                                </div>
+                            </div>
                         </div>
                     <?php
                     }
                     ?>
                     
                     <div class="span2">
-                            <div class="input text">       
-                                <?= $this->Form->input('date', ['id'=>'date', 'placeholder'=>'Select Date Range', 'class'=>'customDateTimeRangePicker', 'label'=>false, 'required'=>'required', 'value'=>'{"start":"'.$drStartDate.'","end":"'.$drEndDate.'"}']); ?>
-                            </div>
+                        <div class="input text">       
+                            <?= $this->Form->input('date', ['id'=>'date', 'placeholder'=>'Select Date Range', 'class'=>'customDateTimeRangePicker', 'label'=>false, 'required'=>'required', 'value'=>'{"start":"'.$drStartDate.'","end":"'.$drEndDate.'"}']); ?>
+                        </div>
                     </div>
                     <div class="span2" style="margin-left:125px;">
                         <?php
@@ -93,3 +103,70 @@
         </div>
     </div>
 </div>
+
+
+<script>
+    var test_types = JSON.parse($('#test_types').val());
+    console.log(test_types);
+
+    // Events
+    $('.dropdown-container')
+    .on('click', '.dropdown-button', function() {
+        console.log('click');
+        $(this).siblings('.dropdown-list').toggle();
+    })
+    .on('input', '.dropdown-search', function() {
+        var target = $(this);
+        var dropdownList = target.closest('.dropdown-list');
+        var search = target.val().toLowerCase();
+        if (!search) {
+            dropdownList.find('li').show();
+            return false;
+        }
+        dropdownList.find('li').each(function() {
+            var text = $(this).text().toLowerCase();
+            var match = text.indexOf(search) > -1;
+            $(this).toggle(match);
+        });
+    })
+    .on('change', '[type="checkbox"]', function() {
+        var container = $(this).closest('.dropdown-container');
+        var numChecked = container. find('[type="checkbox"]:checked').length;
+        container.find('.quantity').text(numChecked || 'Any');
+    });
+
+    var stateTemplate = _.template(
+        '<li>' +
+            '<input name="<%= id %>" type="checkbox">' +
+            '<label for="<%= id %>"><%= capName %></label>' +
+        '</li>'
+    );
+    
+    // Populate list with test types
+    _.each(test_types, function(s) {
+        console.log(s.id)
+        s.capName = s.test_type.toLowerCase();
+        $('.test_types').append(stateTemplate(s));
+    });
+
+
+    function myFunction() {
+    document.getElementById("dropdown-list").classList.toggle("show");
+    }
+
+    function filterFunction() {
+        var input, filter, ul, li, a, i;
+        input = document.getElementById("testTypeSearch");
+        filter = input.value.toUpperCase();
+        div = document.getElementById("dropdown-list");
+        a = div.getElementsByTagName("a");
+        for (i = 0; i < a.length; i++) {
+            txtValue = a[i].textContent || a[i].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            a[i].style.display = "";
+            } else {
+            a[i].style.display = "none";
+            }
+        }
+    }
+</script> 
