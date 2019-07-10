@@ -54,140 +54,16 @@ $( document ).ready(function() {
         });
     });
 
-    //when user clicks breakdown button the breakdown Modal form opens
-    $(".breakdownButton").click(function(){
-        var id = this.id;
-        var mapObj = {
-            countries:"Country",
-            test_types:" Test_type",
-            number_type:"Number_type",
-            call_type: "Call_type",
-            bundle: "Bundle",
-            daily: "Date"
-         };
-        var lastIndex = this.id.lastIndexOf('_');
-        var company_id = id.substr(lastIndex + 1,id.lenght);
-        var breakdown = id.substr(0,lastIndex);
-        var data = JSON.parse($("#data").val());
-        var test_types = JSON.parse($("#test_type_data").val());
-
-        var breakdown_heading = breakdown.replace(/countries|test_types|number_type|call_type|bundle|daily/gi, function(matched){
-            return mapObj[matched];
-        });
-
-        $('#' + breakdown).modal('show');
-        var title = data[company_id]['name'] + ' ' + breakdown.replace('_',' ') + ' breakdown';
-        $('#'+ breakdown + '_breakdown_title').html("");
-        $('#'+ breakdown + '_breakdown_body').html("");
-        $('#'+ breakdown + '_breakdown_title').append(title);
-
-        var html = "<div class='row-fluid'>" +
-                        "<div class='span12'>" +
-                            "<div class='widget-box'>" +
-                                "<div class='widget-content nopadding'>"+
-                                    "<table cellpadding='0' cellspacing='0' class='table table-bordered data-table dataTable' id ='billingTable'>"+
-                                        "<tr><th>" + breakdown_heading.replace('_',' ') + "</th><th>Total test</th><th>Total revenue</th></tr>";
-
-        for (var row in data[company_id][breakdown]) {
-            var billable_calls = data[company_id][breakdown][row]['billable_calls'];
-            var revenue = data[company_id][breakdown][row]['revenue'];
-            if (breakdown == 'test_types') {
-                row = test_types[row];
-            }
-
-            if(breakdown == 'bundle'){
-                html += "<tr><th colspan=3>" + row + "</th></tr>";
-                var bundles = data[company_id][breakdown][row];
-                for(var bundle in bundles){
-                    console.log(data[company_id]['currency_symbol']);
-                    if(bundle == 0){
-                        bundle_name = 'Additional';
-                    }
-                    else{
-                        bundle_name = bundle;
-                    }
-                    html += "<tr><td>" + bundle_name + "</td><td>" + data[company_id][breakdown][row][bundle]['total_tests'] + "</td><td>" + data[company_id]['currency_symbol'] + data[company_id][breakdown][row][bundle]['revenue'] + "</td></tr>"
-                }
-            }
-            else{
-                html += "<tr><td>" + row + "</td><td>" + billable_calls + "</td><td>&euro;" + revenue + "</td></tr>"
-            }
-        }
-        $('#'+ breakdown + '_breakdown_body').append(html);
-    });
 
     /*On change event of filter dropdowns on index page*/
-    $(document).on("change", "#country, #call_start_time, #date, #company, #is-gsm, #filter_date_range, #number-type-id, #test-type, #company-type, #provider", function(){
+    $(document).on("change", "#date, #filter_date_range, #test-type", function(){
         $(this).parents('form').submit();
     });
-
-
-
-    /*Toggle options dropdown on index page*/
-    $('#more_options').on( "click", function() {
-        $('#more_options_list').toggleClass("hiddenElement");
-    });
-
-
-    //when user changes timezone update session
-    $('.currency_rate_1, .currency_rate_3, .currency_rate_4').change(function() {
-        $.ajax({
-            type: "POST",
-            url: window.location.origin +"/billing/billing-summary-daily/change_rate",
-            data: {currency_code_id:$(this).attr('id'), rate: $(this).val()},
-            cache: false,
-            success: function(response){
-                location.reload();
-            },
-            error: function(xhr,textStatus,error){
-                alert(error);
-            }
-        });
-        return false;
-    });
-
 
     $(".filterBox select").select2({
         allowClear: true
     });
 
-    $(".filterBox #provider").select2({
-        placeholder: 'Provider',
-        allowClear: true
-    });
-
-    $(".filterBox #company").select2({
-        placeholder: 'Company',
-        allowClear: true
-    });
-
-    $(".filterBox #country").select2({
-        placeholder: 'Country',
-        allowClear: true
-    });
-
-    $(".filterBox #number-type-id").select2({
-        placeholder: 'Number Type',
-        allowClear: true
-    });
-
-    $(".filterBox #test-type").select2({
-        placeholder: 'Test Type',
-        allowClear: true
-    });
-
-    $(".filterBox #is-gsm").select2({
-        placeholder: 'Call Type',
-        allowClear: true
-    });
-
-    $(".filterBox #company-type").select2({
-        placeholder: 'Company Type',
-        allowClear: true
-    });
-
-  
-  
     /*refresh page after modal closes*/
     $('.close').on( "click", function() {
         /*Reload page on popup close only if form is submitted else just close popup*/
@@ -340,7 +216,6 @@ $( document ).ready(function() {
 });
 
 
-
 function constructModalContent(results) {
     var span = document.createElement("span");
     var table = document.createElement("table");
@@ -435,75 +310,14 @@ $(document).ready(function(){
     var total_tests_breakdown = JSON.parse($('#total_tests_breakdown').val());
     var company_breakdown = JSON.parse($('#company_breakdown').val());
     var company_names = JSON.parse($('#company_names').val());
+    var test_types = JSON.parse($('#test_types').val());
     console.log(total_tests_breakdown)
     console.log(company_breakdown)
     console.log(company_names)
-
+    console.log(test_types);
+    
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(drawChart);
-
-    // function drawChart() {
-    //     var data = new google.visualization.DataTable();
-
-    //     data.addColumn('number', 'Date');
-    //     data.addColumn('number', 'Total PSTN Calls');
-    //     data.addColumn('number', 'Total GSM Calls');
-
-    //     var ticks = [];
-    //     for(var i=0; i<total_tests_breakdown.length; i++){
-    //         var d = new Date()
-    //         d = new Date(total_tests_breakdown[i]['hour_timestamp'])
-    //         d.setHours(d.getHours() - 1);
-
-    //         var hours = ("0" + d.getHours()).slice(-2);
-    //         var minutes = ("0" + d.getMinutes()).slice(-2)
-    //         var seconds = ("0" + d.getSeconds()).slice(-2)
-
-    //         var day = d.getDate();
-    //         var month = d.toLocaleString('en-us', { month: 'short' });
-    //         var year = d.getFullYear();
-            
-    //         ticks.push({
-    //             v: i,
-    //             f: day + ' ' + month + ' ' + year + ' ' + hours + ':' + minutes + ':' + seconds
-    //         });
-
-    //         data.addRow(
-    //             [{v: i, f: day + ' ' + month + ' ' + year + ' ' + hours + ':' + minutes + ':' + seconds}, parseFloat(total_tests_breakdown[i]['total_pstn_calls']), parseFloat(total_tests_breakdown[i]['total_gsm_calls'])]
-    //         );
-    //     }
-            
-    //     var options = {
-    //         title: 'Summary Hourly',
-    //         curveType: 'function',
-    //         legend: { position: 'top' },
-    //         // pointSize: 1,
-    //         hAxis: {
-    //             title: 'Hour Timestamp',
-    //             ticks: ticks,
-    //             viewWindowMode: "explicit", viewWindow:{ min: 0 },
-    //             gridlines: {
-    //                 count: 4
-    //             },
-    //         },
-    //         hAxes: {
-    //             gridlines: {
-    //                 count: 4
-    //             },
-    //         },
-    //         vAxis: {
-    //             title: 'Total Tests',
-    //             viewWindowMode: "explicit", viewWindow:{ min: 0 },
-    //             gridlines: {
-    //                 count: 4
-    //             },
-    //             // minorGridlines: { count: 0 }
-    //         }
-    //     };
-
-    //     var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-    //     chart.draw(data, options);
-    // }
 
     function drawChart(){
         var data = new google.visualization.DataTable();
@@ -615,24 +429,49 @@ $(document).ready(function(){
         });
         return map;
     }
+
+    $('.dropdown-container').onload = function() {
+        console.log("Load");
+        var container = $(this).closest('.dropdown-container');
+        var numChecked = container. find('[type="checkbox"]:checked').length;
+        container.find('.quantity').text(numChecked || 'Any');
+    };
     
-    /*Submit form on selecting second date*/
-    $('.customDateTimeRangePicker').daterangepicker({
-        initialText: 'Date Range',
-        datepickerOptions : {
-                numberOfMonths : 1
-        },
-        presetRanges:
-            [
-                { text: 'Today', dateStart: function() { return moment(); }, dateEnd: function() { return moment(); } },
-                { text: 'Yesterday', dateStart: function() { return moment().subtract('days', 1); }, dateEnd: function() { return moment().subtract('days', 1); } },
-                { text: 'This Week', dateStart: function() { return moment().startOf('week'); }, dateEnd: function() { return moment().endOf('week'); } },
-                { text: 'Last Week', dateStart: function() { return moment().subtract('weeks', 1).startOf('week'); }, dateEnd: function() { return moment().subtract('weeks', 1).endOf('week'); } },
-                { text: 'This Month', dateStart: function() { return moment().startOf('month'); }, dateEnd: function() { return moment().endOf('month'); } },
-                { text: 'Last Month', dateStart: function() { return moment().subtract('months', 1).startOf('month'); }, dateEnd: function() { return moment().subtract('months', 1).endOf('month'); } },
-                { text: 'This Year', dateStart: function() { return moment().startOf('year'); }, dateEnd: function() { return moment().endOf('year'); } },
-                { text: 'Last Year', dateStart: function() { return moment().subtract('years', 1).startOf('year'); }, dateEnd: function() { return moment().subtract('years', 1).endOf('year'); } },
-                { text: 'All Time', dateStart: function() { return moment(new Date(0)); }, dateEnd: function() { return moment(new Date('9999-12-31')); } }
-            ],
-    });
+     // Dropdown
+     $('.dropdown-container')
+     .on('click', '.dropdown-button', function() {
+         console.log('click');
+         $(this).siblings('.dropdown-list').toggle();
+     })
+     .on('input', '.dropdown-search', function() {
+         var target = $(this);
+         var dropdownList = target.closest('.dropdown-list');
+         var search = target.val().toLowerCase();
+         if (!search) {
+             dropdownList.find('li').show();
+             return false;
+         }
+         dropdownList.find('li').each(function() {
+             var text = $(this).text().toLowerCase();
+             var match = text.indexOf(search) > -1;
+             $(this).toggle(match);
+         });
+     })
+     .on('change', '[type="checkbox"]', function() {
+         var container = $(this).closest('.dropdown-container');
+         var numChecked = container. find('[type="checkbox"]:checked').length;
+         container.find('.quantity').text(numChecked || 'Any');
+     });
+ 
+    //  var stateTemplate = _.template(
+    //      '<li>' +
+    //          '<input name="test_type[]" value="<%= id %>" type="checkbox">' +
+    //          '<label for="test_type"><%= test_type %></label>' +
+    //      '</li>'
+    //  );
+     
+    //  // Populate list with test types
+    //  _.each(test_types, function(s) {
+    //      $('.test_types').append(stateTemplate(s));
+    //  }); 
 });

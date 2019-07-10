@@ -941,7 +941,6 @@ input[type="search"] {
 }
 
 .test_types {
-    margin: 10px 3px;
     max-height: 200px;
     overflow-y: auto;
 }

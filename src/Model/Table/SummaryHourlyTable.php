@@ -55,8 +55,10 @@ class SummaryHourlyTable extends Table
                 'callback' => function ($query, $args, $filter) {
                     if($args['test_type'] === 'NULL') {
                         $query->where(['SummaryHourly.test_type_id IS ' => null]);
-                    } else {
-                        $query->where(['SummaryHourly.test_type_id ' => $args['test_type']]);
+                    }
+                    else {
+                        debug($args['test_type']);
+                        $query->where(['SummaryHourly.test_type_id IN' => $args['test_type']]);
                     }
                 }
             ])
@@ -117,11 +119,10 @@ class SummaryHourlyTable extends Table
 
     public function getFilters()
     {
+        // debug($_GET["test_type"]);
         $testType = $this->TestType->find('list')->order(['id'=>'ASC']);
+        $result['search'] = ['id' => 'test_type', 'class' => 'dropdown-search', 'type' => 'search', 'multiple' => true, 'label' => false, 'value' => false, 'autocomplete' => 'off', 'autocorrect' => 'off', 'spellcheck' => 'false'];
         
-        // $result['test_type'] = ['type' => 'select', 'multiple' => true, 'options' => $testType, 'label' => false, 'data-placeholder' => 'Test type'];
-        $result['test_type'] = ['id' => 'testTypeSearch', 'class' => 'dropdown-search', 'type' => 'text', 'label' => false, 'onkeyup' => 'filterFunction()'];
-
         return $result;
     }
 }
