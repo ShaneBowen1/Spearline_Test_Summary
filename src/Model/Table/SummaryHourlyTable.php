@@ -57,8 +57,17 @@ class SummaryHourlyTable extends Table
                         $query->where(['SummaryHourly.test_type_id IS ' => null]);
                     }
                     else {
-                        debug($args['test_type']);
                         $query->where(['SummaryHourly.test_type_id IN' => $args['test_type']]);
+                    }
+                }
+            ])
+            ->add('company', 'Search.Callback', [
+                'callback' => function ($query, $args, $filter) {
+                    if($args['company'] === 'NULL') {
+                        $query->where(['SummaryHourly.company_id IS ' => null]);
+                    }
+                    else {
+                        $query->where(['SummaryHourly.company_id IN' => $args['company']]);
                     }
                 }
             ])
@@ -72,7 +81,7 @@ class SummaryHourlyTable extends Table
                              $query->where(['SummaryHourly.hour_timestamp >=' => $dates->start . ' 00:00:00', 'SummaryHourly.hour_timestamp < ' => $dates->end . ' 23:59:59']);
                          }
                          else{
-                             $query->where(['SummaryHourly.hour_timestamp >=' => date('Y-m-01 00:00:00', strtotime("-1 month")), 'SummaryHourly.hour_timestamp < ' => date('Y-m-t 23:59:59', strtotime("-1 month"))]);
+                             $query->where(['SummaryHourly.hour_timestamp >=' => date('Y-m-d 00:00:00', strtotime("-6 days")), 'SummaryHourly.hour_timestamp < ' => date('Y-m-d 23:59:59')]);
                          }
                      }
                  }
@@ -120,9 +129,12 @@ class SummaryHourlyTable extends Table
     public function getFilters()
     {
         // debug($_GET["test_type"]);
-        $testType = $this->TestType->find('list')->order(['id'=>'ASC']);
-        $result['search'] = ['id' => 'test_type', 'class' => 'dropdown-search', 'type' => 'search', 'multiple' => true, 'label' => false, 'value' => false, 'autocomplete' => 'off', 'autocorrect' => 'off', 'spellcheck' => 'false'];
-        
+        $testType = $this->TestType->find('list')->order(['test_type'=>'ASC']);
+        $result['testTypeSearch'] = ['name' => 'Test Type', 'id' => 'test_type', 'class' => 'dropdown-search', 'type' => 'search', 'multiple' => true, 'label' => false, 'value' => false, 'autocomplete' => 'off', 'autocorrect' => 'off', 'spellcheck' => 'false'];
+
+        $company = $this->Company->find('list')->order(['name'=>'ASC']);
+        $result['companySearch'] = ['name' => 'Company', 'id' => 'company', 'class' => 'dropdown-search', 'type' => 'search', 'multiple' => true, 'label' => false, 'value' => false, 'autocomplete' => 'off', 'autocorrect' => 'off', 'spellcheck' => 'false'];
+    
         return $result;
     }
 }

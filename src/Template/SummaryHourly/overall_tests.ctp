@@ -4,6 +4,7 @@
  * @var \App\Model\Entity\SummaryHourly[]|\Cake\Collection\CollectionInterface $summaryHourly
  */
 ?>
+<?= $this->Form->hidden('search_params',['id'=>'search_params', 'value'=>json_encode($_searchParams)]) ?>
 <?= $this->Form->hidden('total_tests_breakdown',['id'=>'total_tests_breakdown', 'value'=>json_encode($totalTestsBreakdown)]) ?>
 <?= $this->Form->hidden('company_breakdown',['id'=>'company_breakdown', 'value'=>json_encode($companyBreakdown)]) ?>
 <?= $this->Form->hidden('company_names',['id'=>'company_names', 'value'=>json_encode($companyNames)]) ?>
@@ -22,6 +23,8 @@
                     echo $this->Form->submit('',['style'=>'display:none;']);
                     /*Display filters dynamically made through controller*/
                     foreach ($filters as $key=>$value){
+                        // debug($key);
+                        // debug($value);
                         /*Append first option of dropdown as blank(without value and label) */
                         if(isset($value['options'])) {
                         /*If value options are object , it means we got direct query result so convert it to array for 
@@ -34,39 +37,71 @@
                         $value['options'] = ['' => ''] + $options_v ;
                         } ?>
                         <div class="span2 widerFilter">
-                            <div class="dropdown-container">
+                            <div class="dropdown-container" name=<?php echo $value['id']?>>
                                 <div class="dropdown-button noselect">
-                                    <div class="dropdown-label">Test Types</div>
-                                    <div class="dropdown-quantity">(<span class="quantity">Any</span>)</div>
+                                    <div class="dropdown-label"><?php echo $value['name'] ?></div>
+                                    <div class="dropdown-quantity"><span name=<?php echo $value['id'] ?> class="quantity"></span></div>
                                 </div>
                                 <div class="dropdown-list" style="display: none;">
                                     <?= $this->Form->input($key, $value);?>
-                                    <ul class="test_types">
-                                        <?php if(isset($_GET["test_type"])){
-                                            foreach ($testTypes as $value){
-                                                if(in_array($value->id, $_GET["test_type"])) { ?>
-                                                    <li style="list-style-type: none">
-                                                        <input name="test_type[]" value=<?php echo $value->id ?> type="checkbox" style="margin: 0" checked>
-                                                        <label for="test_type"><?php echo $value->test_type ?></label>
-                                                    </li>
-                                                <?php 
+                                    <ul class="test_types" style="margin: 0">
+                                        <?php if(isset($_GET[$value['id']])){
+                                            if($value['id'] == 'test_type'){
+                                                foreach ($testTypes as $value){
+                                                    if(in_array($value->id, $_GET["test_type"])) { ?>
+                                                        <li style="list-style-type: none">
+                                                            <input name="test_type[]" value=<?php echo $value->id ?> type="checkbox" style="margin: 0" checked>
+                                                            <label for="test_type"><?php echo $value->test_type ?></label>
+                                                        </li>
+                                                    <?php 
+                                                    }
+                                                    else { ?>
+                                                        <li style="list-style-type: none">
+                                                            <input name="test_type[]" value=<?php echo $value->id ?> type="checkbox" style="margin: 0">
+                                                            <label for="test_type"><?php echo $value->test_type ?></label>
+                                                        </li>
+                                                    <?php
+                                                    }
                                                 }
-                                                else { ?>
+                                            }
+                                            elseif($value['id'] == 'company'){
+                                                foreach ($companyNames as $value){
+                                                    if(in_array($value->id, $_GET["company"])) { ?>
+                                                        <li style="list-style-type: none">
+                                                            <input name="company[]" value=<?php echo $value->id ?> type="checkbox" style="margin: 0" checked>
+                                                            <label for="company"><?php echo $value->name ?></label>
+                                                        </li>
+                                                    <?php 
+                                                    }
+                                                    else { ?>
+                                                        <li style="list-style-type: none">
+                                                            <input name="company[]" value=<?php echo $value->id ?> type="checkbox" style="margin: 0">
+                                                            <label for="company"><?php echo $value->name ?></label>
+                                                        </li>
+                                                    <?php
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        else {
+                                            if($value['id'] == 'test_type'){
+                                                foreach ($testTypes as $value){ ?>
                                                     <li style="list-style-type: none">
                                                         <input name="test_type[]" value=<?php echo $value->id ?> type="checkbox" style="margin: 0">
                                                         <label for="test_type"><?php echo $value->test_type ?></label>
                                                     </li>
-                                                <?php
+                                                    <?php
                                                 }
                                             }
-                                        }
-                                        else {
-                                            foreach ($testTypes as $value){ ?>
-                                                <li style="list-style-type: none">
-                                                    <input name="test_type[]" value=<?php echo $value->id ?> type="checkbox" style="margin: 0">
-                                                    <label for="test_type"><?php echo $value->test_type ?></label>
-                                                </li>
-                                                <?php
+                                            elseif($value['id'] == 'company'){
+                                                foreach ($companyNames as $value){ ?>
+                                                    <li style="list-style-type: none">
+                                                        <input name="company[]" value=<?php echo $value->id ?> type="checkbox" style="margin: 0">
+                                                        <label for="company"><?php echo $value->name ?></label>
+                                                    </li>
+                                                    <?php
+                                                }
                                             }
                                         }
                                         ?>
@@ -77,15 +112,18 @@
                     <?php
                     }
                     ?>
-                    
                     <div class="span2">
                         <div class="input text">       
                             <?= $this->Form->input('date', ['id'=>'date', 'placeholder'=>'Select Date Range', 'class'=>'customDateTimeRangePicker', 'label'=>false, 'required'=>'required', 'value'=>'{"start":"'.$drStartDate.'","end":"'.$drEndDate.'"}']); ?>
                         </div>
                     </div>
-                    <div class="span2" style="margin-left:125px;">
+                    <div class="span2" style="margin-left:125px; display:flex;">
                         <?php
-                        //echo $this->Html->link('Reset', ['action' => 'index']);
+                        echo $this->Form->submit('Apply',
+                                [
+                                    'type' => 'submit',
+                                    'id' => 'submit_button'
+                                ]);
                         echo $this->Form->button('Reset', 
                                 [
                                     'type' => 'button',

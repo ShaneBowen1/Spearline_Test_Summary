@@ -902,6 +902,9 @@ span.editable{
     font-size: 14px;
     font-family: sans-serif;
     overflow: auto;
+    /* width: max-content; */
+    position: absolute;
+    width: 135px;
 }
 
 .dropdown-button {
@@ -912,6 +915,7 @@ span.editable{
     cursor: pointer;
     border: 1px solid lightgray;
     box-sizing: border-box;
+    border-radius: 4px;
 }
 
 .dropdown-label, .dropdown-quantity {
@@ -929,11 +933,13 @@ span.editable{
 .dropdown-list {
     float: left;
     width: 100%;
-
+    background-color: white;
     border: 1px solid lightgray;
     border-top: none;
     box-sizing: border-box;
     padding: 4px 1px;
+    z-index: 1051;
+    position: relative;
 }
 
 input[type="search"] {
@@ -952,4 +958,19 @@ input[type="checkbox"] {
 
 .dropdown-search {
     width: -webkit-fill-available;
+}
+
+#submit_button{
+    /*width: 10%;*/
+    height:28px;
+    background-color: #2f3d54;
+    color:#ffffff;
+    border:0;
+    float: left;
+    margin-left: 7%;
+    border-radius: 5px;
+}
+
+#submit_button:hover{
+    background-color: #03a9f4;
 }

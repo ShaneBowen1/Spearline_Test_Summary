@@ -215,7 +215,6 @@ $( document ).ready(function() {
     });
 });
 
-
 function constructModalContent(results) {
     var span = document.createElement("span");
     var table = document.createElement("table");
@@ -311,15 +310,109 @@ $(document).ready(function(){
     var company_breakdown = JSON.parse($('#company_breakdown').val());
     var company_names = JSON.parse($('#company_names').val());
     var test_types = JSON.parse($('#test_types').val());
+    var search_params = JSON.parse($('#search_params').val());
     console.log(total_tests_breakdown)
     console.log(company_breakdown)
     console.log(company_names)
     console.log(test_types);
+    console.log(search_params);
     
     google.charts.load('current', {'packages':['corechart']});
-    google.charts.setOnLoadCallback(drawChart);
 
-    function drawChart(){
+    if(typeof search_params['company'] == 'undefined'){
+        console.log("Line Chart");
+        google.charts.setOnLoadCallback(drawLineChart);
+    }
+    else{
+        console.log("Area Chart");
+        google.charts.setOnLoadCallback(drawAreaChart);
+    }
+
+    var numChecked = $("[name='test_type']").find('[type="checkbox"]:checked').length;
+    var numChecked2 = $("[name='company']").find('[type="checkbox"]:checked').length;
+
+    if(numChecked > 0){
+        $("[name='test_type'] .quantity").text('(' + numChecked + '/' + test_types.length + ')' || '');
+    }
+    else{
+        $("[name='test_type'] .quantity").text('');
+    }
+
+    
+    if(numChecked2 > 0){
+        $("[name='company'] .quantity").text('(' + numChecked2 + '/' + company_names.length + ')' || '');
+    }
+    else{
+        $("[name='company'] .quantity").text('');
+    }
+
+    function drawLineChart() {
+        var data = new google.visualization.DataTable();
+
+        data.addColumn('number', 'Date');
+        data.addColumn('number', 'Total PSTN Calls');
+        data.addColumn('number', 'Total GSM Calls');
+
+        var ticks = [];
+        for(var i=0; i<total_tests_breakdown.length; i++){
+            var d = new Date()
+            d = new Date(total_tests_breakdown[i]['hour_timestamp'])
+            d.setHours(d.getHours() - 1);
+
+            var hours = ("0" + d.getHours()).slice(-2);
+            var minutes = ("0" + d.getMinutes()).slice(-2)
+            var seconds = ("0" + d.getSeconds()).slice(-2)
+
+            var day = d.getDate();
+            var month = d.toLocaleString('en-us', { month: 'short' });
+            var year = d.getFullYear();
+            
+            ticks.push({
+                v: i,
+                f: day + ' ' + month + ' ' + year + ' ' + hours + ':' + minutes + ':' + seconds
+            });
+
+            data.addRow(
+                [{v: i, f: day + ' ' + month + ' ' + year + ' ' + hours + ':' + minutes + ':' + seconds}, parseFloat(total_tests_breakdown[i]['total_pstn_calls']), parseFloat(total_tests_breakdown[i]['total_gsm_calls'])]
+            );
+        }
+            
+        var options = {
+            title: 'Summary Hourly',
+            curveType: 'function',
+            legend: { position: 'right' },
+            focusTarget: 'category',
+            isStacked: true,
+            backgroundColor:'transparent',
+            // pointSize: 3,
+            hAxis: {
+                title: 'Hour Timestamp',
+                ticks: ticks,
+                viewWindowMode: "explicit", viewWindow:{ min: 0 },
+                gridlines: {
+                    count: 4
+                },
+            },
+            hAxes: {
+                gridlines: {
+                    count: 4
+                },
+            },
+            vAxis: {
+                title: 'Total Tests',
+                viewWindowMode: "explicit", viewWindow:{ min: 0 },
+                gridlines: {
+                    count: 4
+                },
+                // minorGridlines: { count: 0 }
+            }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+    }
+
+    function drawAreaChart(){
         var data = new google.visualization.DataTable();
         data.addColumn('number', 'Date');
 
@@ -333,7 +426,13 @@ $(document).ready(function(){
         var topTests = 0;
         var totalTests = 0;
         var allCompanies = [];
-        var selectedCompanies = [1, 2, 3, 4, 6]
+        // var selectedCompanies = [1, 2, 3, 4, 6]
+        var selectedCompanies = [];
+
+        for(var i=0; i<search_params['company'].length; i++) {
+            selectedCompanies[i] = parseInt(search_params['company'][i]);
+        }
+        console.log(selectedCompanies);
 
         for(var i=0; i<company_breakdown.length; i++){
             if(allCompanies.indexOf(company_breakdown[i]['company_id']) == -1){
@@ -350,7 +449,10 @@ $(document).ready(function(){
         for(var i=0; i<selectedCompanies.length; i++){
             data.addColumn('number', companyNames[selectedCompanies[i]])
         }
-        data.addColumn('number', 'Others');
+
+        if(selectedCompanies.length > 5){
+            data.addColumn('number', 'Others');
+        }
 
         for (let [key, value] of total_test_list) {
             key = (JSON.parse(key));
@@ -392,7 +494,10 @@ $(document).ready(function(){
                 }
             }
            
-            values.push(totalTests - topTests);
+            if(selectedCompanies.length > 5){
+                values.push(totalTests - topTests);
+            }
+
             data.addRow(values);
             console.log(values);
 
@@ -406,9 +511,10 @@ $(document).ready(function(){
             title: 'Overall Tests',
             hAxis: {title: 'Hour Timestamp', ticks: ticks,  titleTextStyle: {color: '#333'}},
             vAxis: {title: 'Total Tests', minValue: 0},
-            pointSize: 3,
+            // pointSize: 3,
             isStacked: true,
             backgroundColor:'transparent',
+            focusTarget: 'category',
             // legend: {position: 'top'}
             // interpolateNulls: true
           };
@@ -430,17 +536,9 @@ $(document).ready(function(){
         return map;
     }
 
-    $('.dropdown-container').onload = function() {
-        console.log("Load");
-        var container = $(this).closest('.dropdown-container');
-        var numChecked = container. find('[type="checkbox"]:checked').length;
-        container.find('.quantity').text(numChecked || 'Any');
-    };
-    
      // Dropdown
      $('.dropdown-container')
      .on('click', '.dropdown-button', function() {
-         console.log('click');
          $(this).siblings('.dropdown-list').toggle();
      })
      .on('input', '.dropdown-search', function() {
@@ -456,12 +554,47 @@ $(document).ready(function(){
              var match = text.indexOf(search) > -1;
              $(this).toggle(match);
          });
-     })
-     .on('change', '[type="checkbox"]', function() {
-         var container = $(this).closest('.dropdown-container');
-         var numChecked = container. find('[type="checkbox"]:checked').length;
-         container.find('.quantity').text(numChecked || 'Any');
      });
+    //  .on('change', '[type="checkbox"]', function() {
+    //      var container = $(this).closest('.dropdown-container');
+    //      console.log(container);
+    //      var numChecked = container.find('[type="checkbox"]:checked').length;
+         
+    //      if(numChecked > 0){
+    //         container.find('.quantity').text('(' + numChecked + '/' + numCbs + ')' || '');
+    //      }
+    //      else{
+    //         container.find('.quantity').text('');
+    //      }
+    //  });
+
+    $("[name='test_type']")
+    .on('change', '[type="checkbox"]', function() {
+        var container = $(this).closest('.dropdown-container');
+        console.log(container);
+        var numChecked = container.find('[type="checkbox"]:checked').length;
+        
+        if(numChecked > 0){
+           container.find('.quantity').text('(' + numChecked + '/' + test_types.length + ')' || '');
+        }
+        else{
+           container.find('.quantity').text('');
+        }
+    });
+
+    $("[name='company']")
+    .on('change', '[type="checkbox"]', function() {
+        var container = $(this).closest('.dropdown-container');
+        console.log(container);
+        var numChecked2 = container.find('[type="checkbox"]:checked').length;
+        
+        if(numChecked2 > 0){
+           container.find('.quantity').text('(' + numChecked2 + '/' + company_names.length + ')' || '');
+        }
+        else{
+           container.find('.quantity').text('');
+        }
+    });
  
     //  var stateTemplate = _.template(
     //      '<li>' +
