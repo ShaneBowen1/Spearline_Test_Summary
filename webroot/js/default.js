@@ -311,20 +311,16 @@ $(document).ready(function(){
     var company_names = JSON.parse($('#company_names').val());
     var test_types = JSON.parse($('#test_types').val());
     var search_params = JSON.parse($('#search_params').val());
+    var total_test_count = JSON.parse($('#total_test_count').val());
     console.log(total_tests_breakdown)
     console.log(company_breakdown)
-    console.log(company_names)
-    console.log(test_types);
-    console.log(search_params);
     
     google.charts.load('current', {'packages':['corechart']});
 
     if(typeof search_params['company'] == 'undefined'){
-        console.log("Line Chart");
         google.charts.setOnLoadCallback(drawLineChart);
     }
     else{
-        console.log("Area Chart");
         google.charts.setOnLoadCallback(drawAreaChart);
     }
 
@@ -346,6 +342,38 @@ $(document).ready(function(){
         $("[name='company'] .quantity").text('');
     }
 
+    var companyNames = {};
+    for(i = 0; i<company_names.length; i++){
+        companyNames[company_names[i]['id']] = company_names[i]['name']
+    }
+    console.log(companyNames);
+
+    const total_test_list = groupBy(company_breakdown, test => JSON.stringify({hour_timestamp: test.hour_timestamp}));
+    firstValue = Array.from(total_test_list.values())[0]
+    console.log(firstValue);
+    lastValue = Array.from(total_test_list.values()).pop();
+    console.log(lastValue);
+
+    var dict = {}
+
+    var template = _.template(
+        '<div ' +
+            'style="font-family:Arial Black; font-size:16px; margin-bottom:11%;">'+ '<%= value %>%' +
+        '</div>'
+    );
+
+    for(var i=0; i<firstValue.length; i++){
+        var diff = lastValue[i]['total'] - firstValue[i]['total'];
+        var percent = (diff / firstValue[i]['total']) * 100;
+        console.log(firstValue[i]['company_id'], Math.round(percent * 100) / 100)
+
+        dict[companyNames[firstValue[i]['company_id']]] = percent
+        console.log(dict)
+
+        // Populate list with percentages
+        $('.percentages-container').append(template({'value' : Math.round(percent * 100) / 100}));
+    }
+  
     function drawLineChart() {
         var data = new google.visualization.DataTable();
 
@@ -416,36 +444,19 @@ $(document).ready(function(){
         var data = new google.visualization.DataTable();
         data.addColumn('number', 'Date');
 
-        const total_test_list = groupBy(company_breakdown, test => JSON.stringify({hour_timestamp: test.hour_timestamp}));
-        console.log(total_test_list);
-
         var values = [];
         var ticks = [];
         var currentCompanies = [];
         var index = 0;
         var topTests = 0;
-        var totalTests = 0;
-        var allCompanies = [];
         // var selectedCompanies = [1, 2, 3, 4, 6]
         var selectedCompanies = [];
+        var k = 0;
 
         for(var i=0; i<search_params['company'].length; i++) {
             selectedCompanies[i] = parseInt(search_params['company'][i]);
         }
-        console.log(selectedCompanies);
 
-        for(var i=0; i<company_breakdown.length; i++){
-            if(allCompanies.indexOf(company_breakdown[i]['company_id']) == -1){
-                allCompanies.push(company_breakdown[i]['company_id'])
-            }
-        }
-        allCompanies = allCompanies.sort()
-
-        var companyNames = {};
-        for(i = 0; i<company_names.length; i++){
-            companyNames[company_names[i]['id']] = company_names[i]['name']
-        }
-        
         for(var i=0; i<selectedCompanies.length; i++){
             data.addColumn('number', companyNames[selectedCompanies[i]])
         }
@@ -475,14 +486,14 @@ $(document).ready(function(){
 
             values = [{v: index, f: day + ' ' + month + ' ' + year + ' ' + hours + ':' + minutes + ':' + seconds}]
             index += selectedCompanies.length
-            // console.log(value);
 
             for(var i=0; i<value.length; i++){
                 currentCompanies.push(parseFloat(value[i]['company_id']))
-                totalTests +=parseFloat(value[i]['total'])
             }
-            // console.log(currentCompanies);
-            // console.log(selectedCompanies)
+
+            console.log("Selected Companies", selectedCompanies);
+            console.log("Current Companies", currentCompanies);
+            console.log("Values", value);
 
             for(var i=0; i<selectedCompanies.length; i++){
                 if(currentCompanies.indexOf(selectedCompanies[i]) >= 0){
@@ -495,7 +506,8 @@ $(document).ready(function(){
             }
            
             if(selectedCompanies.length > 5){
-                values.push(totalTests - topTests);
+                values.push(total_test_count[k]['total'] - topTests);
+                k+=1
             }
 
             data.addRow(values);
@@ -504,17 +516,16 @@ $(document).ready(function(){
             currentCompanies = [];
             values = [];
             topTests = 0;
-            totalTests = 0;
         }
 
         var options = {
             title: 'Overall Tests',
             hAxis: {title: 'Hour Timestamp', ticks: ticks,  titleTextStyle: {color: '#333'}},
             vAxis: {title: 'Total Tests', minValue: 0},
-            // pointSize: 3,
             isStacked: true,
             backgroundColor:'transparent',
             focusTarget: 'category',
+            // pointSize: 3,
             // legend: {position: 'top'}
             // interpolateNulls: true
           };

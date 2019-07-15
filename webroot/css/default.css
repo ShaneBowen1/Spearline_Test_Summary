@@ -867,7 +867,7 @@ span.editable{
     background: orange;
 }
 
-.overlay {
+.total-container {
     display: inline-flex;
     /* width: 800px; */
     /* height: 200px; */
@@ -876,6 +876,16 @@ span.editable{
     right: 15%; /* chartArea right */
     /* z-index:-1; */
     z-index: 1;
+}
+
+.percentages-container {
+    display: inline-block;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    height: fit-content;
+    z-index: 2;
+    position: absolute;
 }
 
 .google-visualization-tooltip{
