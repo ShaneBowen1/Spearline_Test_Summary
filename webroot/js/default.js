@@ -342,38 +342,14 @@ $(document).ready(function(){
         $("[name='company'] .quantity").text('');
     }
 
-    var companyNames = {};
-    for(i = 0; i<company_names.length; i++){
-        companyNames[company_names[i]['id']] = company_names[i]['name']
-    }
-    console.log(companyNames);
-
     const total_test_list = groupBy(company_breakdown, test => JSON.stringify({hour_timestamp: test.hour_timestamp}));
-    firstValue = Array.from(total_test_list.values())[0]
-    console.log(firstValue);
-    lastValue = Array.from(total_test_list.values()).pop();
-    console.log(lastValue);
-
-    var dict = {}
 
     var template = _.template(
         '<div ' +
-            'style="font-family:Arial Black; font-size:16px; margin-bottom:11%;">'+ '<%= value %>%' +
+            'style="font-family:Arial Black; font-size:16px; margin-bottom:11.5%;">'+ '<%= value %>%' +
         '</div>'
     );
 
-    for(var i=0; i<firstValue.length; i++){
-        var diff = lastValue[i]['total'] - firstValue[i]['total'];
-        var percent = (diff / firstValue[i]['total']) * 100;
-        console.log(firstValue[i]['company_id'], Math.round(percent * 100) / 100)
-
-        dict[companyNames[firstValue[i]['company_id']]] = percent
-        console.log(dict)
-
-        // Populate list with percentages
-        $('.percentages-container').append(template({'value' : Math.round(percent * 100) / 100}));
-    }
-  
     function drawLineChart() {
         var data = new google.visualization.DataTable();
 
@@ -447,11 +423,20 @@ $(document).ready(function(){
         var values = [];
         var ticks = [];
         var currentCompanies = [];
-        var index = 0;
-        var topTests = 0;
-        // var selectedCompanies = [1, 2, 3, 4, 6]
         var selectedCompanies = [];
+        var topTests = 0;
+        var index = 0;
         var k = 0;
+        var firstValues = {};
+        var lastValues = {};
+        var selectedCompNames = [];
+        var percentArray = []
+
+        var companyNames = {};
+        for(i = 0; i<company_names.length; i++){
+            companyNames[company_names[i]['id']] = company_names[i]['name']
+        }
+        console.log(companyNames);
 
         for(var i=0; i<search_params['company'].length; i++) {
             selectedCompanies[i] = parseInt(search_params['company'][i]);
@@ -491,31 +476,76 @@ $(document).ready(function(){
                 currentCompanies.push(parseFloat(value[i]['company_id']))
             }
 
-            console.log("Selected Companies", selectedCompanies);
-            console.log("Current Companies", currentCompanies);
-            console.log("Values", value);
-
+            console.log(value);
             for(var i=0; i<selectedCompanies.length; i++){
                 if(currentCompanies.indexOf(selectedCompanies[i]) >= 0){
-                    values.push(parseFloat(value[currentCompanies.indexOf(selectedCompanies[i])]['total']))
-                    topTests += parseFloat(value[currentCompanies.indexOf(selectedCompanies[i])]['total'])
+                    values.push(parseFloat(value[currentCompanies.indexOf(selectedCompanies[i])]['total']));
+                    topTests += parseFloat(value[currentCompanies.indexOf(selectedCompanies[i])]['total']);
+
+                    if(!(companyNames[selectedCompanies[i]] in firstValues) == true || firstValues[companyNames[selectedCompanies[i]]] == 0){
+                        firstValues[companyNames[selectedCompanies[i]]] = value[currentCompanies.indexOf(selectedCompanies[i])]['total'];
+                    }
+                    lastValues[companyNames[selectedCompanies[i]]] = value[currentCompanies.indexOf(selectedCompanies[i])]['total'];
+
+                    if(selectedCompNames.indexOf(companyNames[selectedCompanies[i]]) == -1){
+                        selectedCompNames.push(companyNames[selectedCompanies[i]]);
+                    }
                 }
                 else{
                     values.push(0)
+                    if(!(companyNames[selectedCompanies[i]] in firstValues) == true){
+                        firstValues[companyNames[selectedCompanies[i]]] = 0;
+                    }
+
+                    if(!(companyNames[selectedCompanies[i]] in lastValues) == true){
+                        lastValues[companyNames[selectedCompanies[i]]] = 0;
+                    }
+
+                    if(selectedCompNames.indexOf(companyNames[selectedCompanies[i]]) == -1){
+                        selectedCompNames.push(companyNames[selectedCompanies[i]]);
+                    }
                 }
             }
            
             if(selectedCompanies.length > 5){
                 values.push(total_test_count[k]['total'] - topTests);
+                if(typeof othersFirstValue == 'undefined'){
+                    othersFirstValue = total_test_count[k]['total'] - topTests;
+                }
+                othersLastValue = total_test_count[k]['total'] - topTests;
                 k+=1
             }
-
             data.addRow(values);
-            console.log(values);
 
             currentCompanies = [];
             values = [];
             topTests = 0;
+        }
+
+        console.log(othersFirstValue);
+        console.log(othersLastValue);
+        var diff = othersLastValue - othersFirstValue
+        var percent = Math.round(((diff / othersFirstValue) * 100) * 100) / 100;
+        // $('.percentages-container').append(template({'value' : percent}));
+        percentArray.push(percent);
+        
+        console.log(firstValues);
+        console.log(lastValues);;
+
+        selectedCompNames.sort(function (a, b) {
+            return b.localeCompare(a);
+        });
+        console.log(selectedCompNames);
+
+        for(var i=0; i<selectedCompNames.length; i++){
+            var diff = lastValues[selectedCompNames[i]] - firstValues[selectedCompNames[i]]
+            var percent = Math.round(((diff / firstValues[selectedCompNames[i]]) * 100) * 100) / 100;
+            percent = percent || 0
+
+            percentArray.push(percent);
+            
+            //Populate list with percentages
+            // $('.percentages-container').append(template({'value' : percent}));
         }
 
         var options = {
@@ -525,13 +555,30 @@ $(document).ready(function(){
             isStacked: true,
             backgroundColor:'transparent',
             focusTarget: 'category',
+            // chartArea: {  width: "67%", height: "67%" }
             // pointSize: 3,
-            // legend: {position: 'top'}
             // interpolateNulls: true
           };
 
         var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
         chart.draw(data, options);
+
+        var labelSelector = '> g:eq(1) text:last-child';
+        var svg = $('svg', document.getElementById('chart_div'));
+
+        // function addPercentage(){
+        $(labelSelector, svg).each(function (i, v) {
+            if(percentArray[i] > 0){
+                var newLabel = $(this).text() + ' (+' + percentArray[i] + '%)';
+                // $('<div class=divText>' + percentArray[i] + '</div>').appendTo(this);
+            }
+            else{
+                var newLabel = $(this).text() + ' (' + percentArray[i] + '%)';
+                // $('<div class=divText>' + percentArray[i] + '</div>').appendTo(this);
+            }
+            $(this).text(newLabel);
+        });
+        // }
     }
 
     function groupBy(list, keyGetter) {

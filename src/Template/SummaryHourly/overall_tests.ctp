@@ -153,7 +153,7 @@
                                 <div style="font-family:'Arial Black'; font-size: 16px; margin-right: 15px">Total GSM: <?= number_format($totalGSM) ?></div>
                                 <div style="font-family:'Arial Black'; font-size: 16px;">Avg Tests: <?= number_format($avgTests, 2) ?></div>
                             </div>
-                            <div class="percentages-container" style="top: 25%; right: 2%">
+                            <div class="percentages-container" style="top: 25%; right: 1%">
                             </div>
                         </div>
                     </body>
