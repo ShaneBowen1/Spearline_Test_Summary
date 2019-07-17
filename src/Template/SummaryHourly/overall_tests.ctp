@@ -14,6 +14,8 @@
 <?= $this->Form->hidden('avg_tests',['id'=>'avg_tests', 'value'=>json_encode($avgTests)]) ?>
 <?= $this->Form->hidden('test_types',['id'=>'test_types', 'value'=>json_encode($testTypes)]) ?>
 <?= $this->Form->hidden('total_test_count',['id'=>'total_test_count', 'value'=>json_encode($totalTestCount)]) ?>
+<?= $this->Form->hidden('current_company_totals',['id'=>'current_company_totals', 'value'=>json_encode($currentCompanyTotals)]) ?>
+<?= $this->Form->hidden('last_company_totals',['id'=>'last_company_totals', 'value'=>json_encode($lastCompanyTotals)]) ?>
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="span12">

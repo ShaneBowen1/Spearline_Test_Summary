@@ -135,7 +135,7 @@ class SummaryHourlyController extends AppController
         ->SELECT(['id'=>'id', 'test_type'=>'test_type'])
         ->order('test_type')
         ->toArray();
-        
+
         /*If no daterange selected in filter then show results for current week only*/
         if(empty($this->request->query['date'])){
             // $startDate = date('Y-m-d H:i:s', strtotime("-1 month"));
@@ -166,6 +166,28 @@ class SummaryHourlyController extends AppController
         debug($drEndDate);
 
         $diff = (new \DateTime($startDate))->diff(new \DateTime($endDate . '+1 day'));
+
+        debug(new \DateTime($drStartDate . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days'));
+        debug(new \DateTime($drEndDate . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days'));
+
+        $conditions = ['hour_timestamp >=' => new \DateTime($drStartDate . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days'), 'hour_timestamp < ' => new \DateTime($drEndDate . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days')];
+
+        if(!empty($this->request->query['company'])){
+            $conditions += ['company_id IN' => $this->request->query['company']];
+        }
+
+        $currentCompanyTotals = $this->SummaryHourly->find('search', ['search' => $this->request->query])
+            ->SELECT(['hour_timestamp'=>'hour_timestamp', 'company_id'=>'company_id', 'total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
+            ->group(['company_id'])
+            ->order('company_id')
+            ->toArray();
+
+        $lastCompanyTotals = $this->SummaryHourly->find('all')
+            ->SELECT(['hour_timestamp'=>'hour_timestamp', 'company_id'=>'company_id', 'total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
+            ->group(['company_id'])
+            ->where([$conditions])
+            ->order('company_id')
+            ->toArray();
 
         #Hourly
         if($diff->y == 0 && $diff->m == 0 && $diff->d <= 7){
@@ -245,7 +267,7 @@ class SummaryHourlyController extends AppController
         $avgTests = (sizeof($totalTestsBreakdown) > 0 ? $totalCompanyTests / sizeof($totalTestsBreakdown) : 0);
 
         $filters = $this->SummaryHourly->getFilters();
-        $this->set(compact('summaryHourly', 'totalTestsBreakdown', 'companyBreakdown', 'companyNames', 'totalTestCount', 'totalCompanyTests', 'totalPSTN', 'totalGSM', 'avgTests', 'filters', 'drStartDate', 'drEndDate', 'testTypes'));
+        $this->set(compact('summaryHourly', 'totalTestsBreakdown', 'companyBreakdown', 'companyNames', 'totalTestCount', 'totalCompanyTests', 'totalPSTN', 'totalGSM', 'avgTests', 'filters', 'drStartDate', 'drEndDate', 'testTypes', 'currentCompanyTotals', 'lastCompanyTotals'));
     }
 
     public function individualCompanyTests()
