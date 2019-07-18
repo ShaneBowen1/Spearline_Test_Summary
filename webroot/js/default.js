@@ -293,14 +293,27 @@ $(document).ready(function(){
     var test_types = JSON.parse($('#test_types').val());
     var search_params = JSON.parse($('#search_params').val());
     var total_test_count = JSON.parse($('#total_test_count').val());
+    var total_company_tests = JSON.parse($('#total_company_tests').val());
+    var total_pstn = JSON.parse($('#total_pstn').val());
+    var total_gsm = JSON.parse($('#total_gsm').val());
     var current_company_totals = JSON.parse($('#current_company_totals').val());
-    var old_company_totals = JSON.parse($('#last_company_totals').val());
+    var previous_company_totals = JSON.parse($('#previous_company_totals').val());
+    var current_total_tests = JSON.parse($('#current_total_tests').val());
+    var previous_total_tests = JSON.parse($('#previous_total_tests').val());
     console.log(total_tests_breakdown);
     console.log(company_breakdown);
+    console.log(company_names);
+    console.log(test_types);
+    console.log(total_test_count);
+    console.log(previous_company_totals);
     console.log(current_company_totals);
+    console.log(previous_total_tests);
+    console.log(current_total_tests);
+    console.log(total_company_tests);
+    console.log(total_pstn);
+    console.log(total_gsm);
     
     google.charts.load('current', {'packages':['corechart']});
-
     if(typeof search_params['company'] == 'undefined'){
         google.charts.setOnLoadCallback(drawLineChart);
     }
@@ -308,6 +321,7 @@ $(document).ready(function(){
         google.charts.setOnLoadCallback(drawAreaChart);
     }
 
+    //Dropdown - num of checkboxes ticked
     var numChecked = $("[name='test_type']").find('[type="checkbox"]:checked').length;
     var numChecked2 = $("[name='company']").find('[type="checkbox"]:checked').length;
 
@@ -318,7 +332,6 @@ $(document).ready(function(){
         $("[name='test_type'] .quantity").text('');
     }
 
-    
     if(numChecked2 > 0){
         $("[name='company'] .quantity").text('(' + numChecked2 + '/' + company_names.length + ')' || '');
     }
@@ -327,19 +340,16 @@ $(document).ready(function(){
     }
 
     const total_test_list = groupBy(company_breakdown, test => JSON.stringify({hour_timestamp: test.hour_timestamp}));
-
+    
     function drawLineChart() {
         var data = new google.visualization.DataTable();
-
-        var firstValues = {};
-        var lastValues = {};
+        var ticks = [];
         var percentArray = [];
 
         data.addColumn('number', 'Date');
         data.addColumn('number', 'PSTN Calls');
         data.addColumn('number', 'GSM Calls');
 
-        var ticks = [];
         for(var i=0; i<total_tests_breakdown.length; i++){
             var d = new Date()
             d = new Date(total_tests_breakdown[i]['hour_timestamp'])
@@ -361,22 +371,6 @@ $(document).ready(function(){
             data.addRow(
                 [{v: i, f: day + ' ' + month + ' ' + year + ' ' + hours + ':' + minutes + ':' + seconds}, parseFloat(total_tests_breakdown[i]['total_pstn_calls']), parseFloat(total_tests_breakdown[i]['total_gsm_calls'])]
             );
-
-            if(!('total_pstn_calls' in firstValues) == true || firstValues['total_pstn_calls'] == 0){
-                firstValues['total_pstn_calls'] = parseFloat(total_tests_breakdown[i]['total_pstn_calls']);
-            }
-
-            if(!('total_gsm_calls' in firstValues) == true || firstValues['total_gsm_calls'] == 0){
-                firstValues['total_gsm_calls'] = parseFloat(total_tests_breakdown[i]['total_gsm_calls']);
-            }
-
-            if(parseFloat(total_tests_breakdown[i]['total_pstn_calls']) > 0){
-                lastValues['total_pstn_calls'] = parseFloat(total_tests_breakdown[i]['total_pstn_calls']);
-            }
-            
-            if(parseFloat(total_tests_breakdown[i]['total_gsm_calls']) > 0){
-                lastValues['total_gsm_calls'] = parseFloat(total_tests_breakdown[i]['total_gsm_calls']);
-            }
         }
         
         var options = {
@@ -390,45 +384,44 @@ $(document).ready(function(){
             hAxis: {
                 title: 'Hour Timestamp',
                 ticks: ticks,
-                viewWindowMode: "explicit", viewWindow:{ min: 0 },
+                viewWindowMode: "explicit",
+                viewWindow:{ min: 0 },
                 gridlines: {
                     count: 4
-                },
+                }
             },
             hAxes: {
                 gridlines: {
                     count: 4
-                },
+                }
             },
             vAxis: {
                 title: 'Total Tests',
-                viewWindowMode: "explicit", viewWindow:{ min: 0 },
+                viewWindowMode: "explicit",
+                viewWindow:{ min: 0 },
                 gridlines: {
                     count: 4
-                },
+                }
                 // minorGridlines: { count: 0 }
             }
         };
 
-        diff = lastValues['total_pstn_calls'] - firstValues['total_pstn_calls']
-        percent = Math.round(((diff / firstValues['total_pstn_calls']) * 100) * 100) / 100;
-        percent = percent || 0
-        percentArray.push(percent);
-
-        diff = lastValues['total_gsm_calls'] - firstValues['total_gsm_calls']
-        percent = Math.round(((diff / firstValues['total_gsm_calls']) * 100) * 100) / 100;
-        percent = percent || 0
-        percentArray.push(percent);
-        console.log(percentArray);
-            
-        //Populate list with percentages
-        // $('.percentages-container').append(template({'value' : percent}));
-
-        console.log(firstValues);
-        console.log(lastValues);
-
         var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
         chart.draw(data, options);
+
+        if(previous_total_tests[0]['hour_timestamp'] != null){
+            console.log("Ok");
+            diff = total_pstn - previous_total_tests[0]['total_pstn_calls']
+            percent = Math.round(((diff / previous_total_tests[0]['total_pstn_calls']) * 100) * 100) / 100;
+            percent = percent || 0
+            percentArray.push(percent);
+
+            diff = total_gsm - previous_total_tests[0]['total_gsm_calls']
+            percent = Math.round(((diff / previous_total_tests[0]['total_gsm_calls']) * 100) * 100) / 100;
+            percent = percent || 0
+            percentArray.push(percent);
+        }
+        console.log(percentArray);
 
         var labelSelector = '> g:eq(1) text:last-child';
         var svg = $('svg', document.getElementById('chart_div'));
@@ -439,18 +432,29 @@ $(document).ready(function(){
                 newText.setAttributeNS(null,"font-size","17");
                 newText.setAttributeNS(null,"fill","green");
 
-                var textNode = document.createTextNode("  (+" + percentArray[i] + "%)");
+                var textNode = document.createTextNode("  (+" + percentArray[i]  + "%)");
                 newText.appendChild(textNode);
                 $(this).append(newText);
             }
             else{
-                var newText = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
-                newText.setAttributeNS(null,"font-size","17");
-                newText.setAttributeNS(null,"fill","red");
-
-                var textNode = document.createTextNode("  (" + percentArray[i] + "%)");
-                newText.appendChild(textNode);
-                $(this).append(newText);
+                if(typeof percentArray[i]  == 'undefined'){
+                    var newText = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+                    newText.setAttributeNS(null,"font-size","17");
+                    newText.setAttributeNS(null,"fill","grey");
+    
+                    var textNode = document.createTextNode("  (0%)");
+                    newText.appendChild(textNode);
+                    $(this).append(newText);
+                }
+                else{
+                    var newText = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+                    newText.setAttributeNS(null,"font-size","17");
+                    newText.setAttributeNS(null,"fill","red");
+    
+                    var textNode = document.createTextNode("  (" + percentArray[i]  + "%)");
+                    newText.appendChild(textNode);
+                    $(this).append(newText);
+                }
             }
         });
     }
@@ -462,12 +466,10 @@ $(document).ready(function(){
         var values = [];
         var ticks = [];
         var currentCompanies = [];
-        var selectedCompanies = [];
+        var selectedCompIds = [];
         var topTests = 0;
         var index = 0;
         var k = 0;
-        var firstValues = {};
-        var lastValues = {};
         var selectedCompNames = [];
         var percentArray = []
 
@@ -475,16 +477,18 @@ $(document).ready(function(){
         for(i = 0; i<company_names.length; i++){
             companyNames[company_names[i]['id']] = company_names[i]['name']
         }
+        console.log(companyNames);
 
         for(var i=0; i<search_params['company'].length; i++) {
-            selectedCompanies[i] = parseInt(search_params['company'][i]);
+            selectedCompIds[i] = parseInt(search_params['company'][i]);
+        }
+        console.log(selectedCompIds);
+
+        for(var i=0; i<selectedCompIds.length; i++){
+            data.addColumn('number', companyNames[selectedCompIds[i]])
         }
 
-        for(var i=0; i<selectedCompanies.length; i++){
-            data.addColumn('number', companyNames[selectedCompanies[i]])
-        }
-
-        if(selectedCompanies.length > 5){
+        if(selectedCompIds.length > 5){
             data.addColumn('number', 'Others');
         }
 
@@ -508,36 +512,32 @@ $(document).ready(function(){
             });
 
             values = [{v: index, f: day + ' ' + month + ' ' + year + ' ' + hours + ':' + minutes + ':' + seconds}]
-            index += selectedCompanies.length
+            index += selectedCompIds.length
 
+            console.log(value);
             for(var i=0; i<value.length; i++){
                 currentCompanies.push(parseFloat(value[i]['company_id']))
             }
 
-            console.log(value);
-            for(var i=0; i<selectedCompanies.length; i++){
-                if(currentCompanies.indexOf(selectedCompanies[i]) >= 0){
-                    values.push(parseFloat(value[currentCompanies.indexOf(selectedCompanies[i])]['total']));
-                    topTests += parseFloat(value[currentCompanies.indexOf(selectedCompanies[i])]['total']);
+            for(var i=0; i<selectedCompIds.length; i++){
+                if(currentCompanies.indexOf(selectedCompIds[i]) >= 0){ //Check if company selected is in current company batch
+                    values.push(parseFloat(value[currentCompanies.indexOf(selectedCompIds[i])]['total']));
+                    topTests += parseFloat(value[currentCompanies.indexOf(selectedCompIds[i])]['total']);
 
-                    if(selectedCompNames.indexOf(companyNames[selectedCompanies[i]]) == -1){
-                        selectedCompNames.push(companyNames[selectedCompanies[i]]);
+                    if(selectedCompNames.indexOf(companyNames[selectedCompIds[i]]) == -1){ //Add company name if not in array
+                        selectedCompNames.push(companyNames[selectedCompIds[i]]);
                     }
                 }
                 else{
                     values.push(0)
-                    if(selectedCompNames.indexOf(companyNames[selectedCompanies[i]]) == -1){
-                        selectedCompNames.push(companyNames[selectedCompanies[i]]);
+                    if(selectedCompNames.indexOf(companyNames[selectedCompIds[i]]) == -1){
+                        selectedCompNames.push(companyNames[selectedCompIds[i]]);
                     }
                 }
             }
            
-            if(selectedCompanies.length > 5){
+            if(selectedCompIds.length > 5){
                 values.push(total_test_count[k]['total'] - topTests);
-                if(typeof othersFirstValue == 'undefined'){
-                    othersFirstValue = total_test_count[k]['total'] - topTests;
-                }
-                othersLastValue = total_test_count[k]['total'] - topTests;
                 k+=1
             }
             data.addRow(values);
@@ -554,7 +554,7 @@ $(document).ready(function(){
             isStacked: true,
             backgroundColor:'transparent',
             focusTarget: 'category',
-            // chartArea: {  width: "67%", height: "67%" }
+            chartArea: {  width: "72%" }
             // pointSize: 3,
             // interpolateNulls: true
         };
@@ -562,40 +562,45 @@ $(document).ready(function(){
         var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
         chart.draw(data, options);
 
-        console.log(selectedCompanies);
-        if(selectedCompanies.length > 5){
-            console.log(othersFirstValue);
-            console.log(othersLastValue);
-            var diff = othersLastValue - othersFirstValue
-            var percent = Math.round(((diff / othersFirstValue) * 100) * 100) / 100;
-            percent = percent || 0
-            percentArray.push(percent);
-            // $('.percentages-container').append(template({'value' : percent}));
-        }
+        selectedCompIds.sort(function(a, b){return a-b});
+        console.log(selectedCompIds);
 
         selectedCompNames.sort(function (a, b) {
             return b.localeCompare(a);
         });
         console.log(selectedCompNames);
-
-        console.log(old_company_totals);
+        console.log(previous_company_totals);
         console.log(current_company_totals);
 
         var percentDict = {};
-        for(var i=0; i<selectedCompNames.length; i++){
-            var diff = current_company_totals[i]['total'] - old_company_totals[i]['total']
-            var percent = Math.round(((diff / old_company_totals[i]['total']) * 100) * 100) / 100;
-            percent = percent || 0
-            percentDict[selectedCompNames[i]] = percent;
+        var previous_company_total = 0;
+        for(var i=0; i<selectedCompIds.length; i++){
+            if((typeof current_company_totals[i] != 'undefined') && (typeof previous_company_totals[i] != 'undefined')){
+                var diff = current_company_totals[i]['total'] - previous_company_totals[i]['total'];
+                previous_company_total += parseFloat(previous_company_totals[i]['total']);
+                var percent = Math.round(((diff / previous_company_totals[i]['total']) * 100) * 100) / 100;
+                percent = percent || 0;
+                percentDict[companyNames[selectedCompIds[i]]] = percent;
+            }
+            else{
+                percentDict[companyNames[selectedCompIds[i]]] = 0;
+            }
         }
-        console.log(percentDict);
 
-        for(var i=0; i<current_company_totals.length; i++){
-            var diff = current_company_totals[i]['total'] - old_company_totals[i]['total']
-            var percent = Math.round(((diff / old_company_totals[i]['total']) * 100) * 100) / 100;
-            percent = percent || 0
+        console.log(percentDict);
+        console.log(previous_company_total);
+        console.log(total_company_tests);
+        if(selectedCompIds.length > 5){ //Add others percentage value
+            var diff = ((current_total_tests[0]['total_pstn_calls'] + current_total_tests[0]['total_gsm_calls']) - total_company_tests) - ((previous_total_tests[0]['total_pstn_calls'] + previous_total_tests[0]['total_gsm_calls']) - previous_company_total);
+            var percent = Math.round(((diff / ((previous_total_tests[0]['total_pstn_calls'] + previous_total_tests[0]['total_gsm_calls']) - previous_company_total)) * 100) * 100) / 100;
+            percent = percent || 0;
             percentArray.push(percent);
         }
+
+        for(var i=0; i<selectedCompNames.length; i++){
+            percentArray.push(percentDict[selectedCompNames[i]]);
+        }
+        console.log(percentArray);
 
         //Add Percentage figures to legend labels
         var labelSelector = '> g:eq(1) text:last-child';
@@ -606,12 +611,12 @@ $(document).ready(function(){
                 newText.setAttributeNS(null,"font-size","17");
                 newText.setAttributeNS(null,"fill","green");
 
-                var textNode = document.createTextNode("  (+" + percentArray[i] + "%)");
+                var textNode = document.createTextNode("  (+" + percentArray[i]  + "%)");
                 newText.appendChild(textNode);
                 $(this).append(newText);
             }
             else{
-                if(typeof percentArray[i] == 'undefined'){
+                if(typeof percentArray[i]  == 'undefined' || percentArray[i]  == 0){
                     var newText = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
                     newText.setAttributeNS(null,"font-size","17");
                     newText.setAttributeNS(null,"fill","grey");
@@ -625,7 +630,7 @@ $(document).ready(function(){
                     newText.setAttributeNS(null,"font-size","17");
                     newText.setAttributeNS(null,"fill","red");
     
-                    var textNode = document.createTextNode("  (" + percentArray[i] + "%)");
+                    var textNode = document.createTextNode("  (" + percentArray[i]  + "%)");
                     newText.appendChild(textNode);
                     $(this).append(newText);
                 }
@@ -651,6 +656,7 @@ $(document).ready(function(){
      .on('click', '.dropdown-button', function() {
          $(this).siblings('.dropdown-list').toggle();
      })
+
      .on('input', '.dropdown-search', function() {
          var target = $(this);
          var dropdownList = target.closest('.dropdown-list');
@@ -664,19 +670,7 @@ $(document).ready(function(){
              var match = text.indexOf(search) > -1;
              $(this).toggle(match);
          });
-     });
-    //  .on('change', '[type="checkbox"]', function() {
-    //      var container = $(this).closest('.dropdown-container');
-    //      console.log(container);
-    //      var numChecked = container.find('[type="checkbox"]:checked').length;
-         
-    //      if(numChecked > 0){
-    //         container.find('.quantity').text('(' + numChecked + '/' + numCbs + ')' || '');
-    //      }
-    //      else{
-    //         container.find('.quantity').text('');
-    //      }
-    //  });
+    });
 
     $("[name='test_type']")
     .on('change', '[type="checkbox"]', function() {
@@ -705,16 +699,4 @@ $(document).ready(function(){
            container.find('.quantity').text('');
         }
     });
- 
-    //  var stateTemplate = _.template(
-    //      '<li>' +
-    //          '<input name="test_type[]" value="<%= id %>" type="checkbox">' +
-    //          '<label for="test_type"><%= test_type %></label>' +
-    //      '</li>'
-    //  );
-     
-    //  // Populate list with test types
-    //  _.each(test_types, function(s) {
-    //      $('.test_types').append(stateTemplate(s));
-    //  }); 
 });

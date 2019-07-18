@@ -158,22 +158,35 @@ class SummaryHourlyController extends AppController
             }
         }
 
-        $drStartDate = date('Y-m-d', strtotime($startDate));
+        $drStartDate = date('Y-m-d 00:00:00', strtotime($startDate));
         $drEndDate = new \DateTime($endDate);
-        $drEndDate = $drEndDate->format('Y-m-d');
-
+        $drEndDate = $drEndDate->format('Y-m-d 23:59:59');
         debug($drStartDate);
         debug($drEndDate);
 
         $diff = (new \DateTime($startDate))->diff(new \DateTime($endDate . '+1 day'));
 
-        debug(new \DateTime($drStartDate . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days'));
-        debug(new \DateTime($drEndDate . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days'));
+        debug($diff);
 
-        $conditions = ['hour_timestamp >=' => new \DateTime($drStartDate . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days'), 'hour_timestamp < ' => new \DateTime($drEndDate . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days')];
+        $previousStartDate = (new \DateTime($drStartDate . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days'))->format('Y-m-d 00:00:00');
+        $previousEndDate = (new \DateTime($drEndDate . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days'))->format('Y-m-d 23:59:59');
+        debug($previousStartDate);
+        debug($previousEndDate);
+
+        // $previousEndDate = date($drEndDate, strtotime("-1 month"));
+        // debug($previousEndDate);
+
+        $companyConditions = ['hour_timestamp >=' => $previousStartDate, 'hour_timestamp < ' => $previousEndDate];
+        $currentTotalCondtions = ['hour_timestamp >=' => $startDate, 'hour_timestamp < ' => $endDate];
+        $previousTotalCondtions = ['hour_timestamp >=' => $previousStartDate, 'hour_timestamp < ' => $previousEndDate];
 
         if(!empty($this->request->query['company'])){
-            $conditions += ['company_id IN' => $this->request->query['company']];
+            $companyConditions += ['company_id IN' => $this->request->query['company']];
+        }
+        if(!empty($this->request->query['test_type'])){
+            $companyConditions += ['test_type_id IN' => $this->request->query['test_type']];
+            $currentTotalCondtions += ['test_type_id IN' => $this->request->query['test_type']];
+            $previousTotalCondtions += ['test_type_id IN' => $this->request->query['test_type']];
         }
 
         $currentCompanyTotals = $this->SummaryHourly->find('search', ['search' => $this->request->query])
@@ -181,13 +194,19 @@ class SummaryHourlyController extends AppController
             ->group(['company_id'])
             ->order('company_id')
             ->toArray();
-
-        $lastCompanyTotals = $this->SummaryHourly->find('all')
+        $previousCompanyTotals = $this->SummaryHourly->find('all')
             ->SELECT(['hour_timestamp'=>'hour_timestamp', 'company_id'=>'company_id', 'total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
             ->group(['company_id'])
-            ->where([$conditions])
+            ->where([$companyConditions])
             ->order('company_id')
             ->toArray();
+
+        $currentTotalTests = $this->SummaryHourly->find('all')
+            ->SELECT(['hour_timestamp'=>'hour_timestamp', 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
+            ->where([$currentTotalCondtions]);
+        $previousTotalTests = $this->SummaryHourly->find('all')
+            ->SELECT(['hour_timestamp'=>'hour_timestamp', 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
+            ->where([$previousTotalCondtions]);
 
         #Hourly
         if($diff->y == 0 && $diff->m == 0 && $diff->d <= 7){
@@ -267,19 +286,6 @@ class SummaryHourlyController extends AppController
         $avgTests = (sizeof($totalTestsBreakdown) > 0 ? $totalCompanyTests / sizeof($totalTestsBreakdown) : 0);
 
         $filters = $this->SummaryHourly->getFilters();
-        $this->set(compact('summaryHourly', 'totalTestsBreakdown', 'companyBreakdown', 'companyNames', 'totalTestCount', 'totalCompanyTests', 'totalPSTN', 'totalGSM', 'avgTests', 'filters', 'drStartDate', 'drEndDate', 'testTypes', 'currentCompanyTotals', 'lastCompanyTotals'));
-    }
-
-    public function individualCompanyTests()
-    {
-        $summaryHourly = $this->paginate($this->SummaryHourly);
-        $startDate = date('Y-m-d H:i:s', strtotime("-1 week"));
-        $endDate = date('Y-m-d H:i:s');
-        $totalTestsBreakdown = $this->SummaryHourly->find('all')
-            ->SELECT(['hour_timestamp'=>'hour_timestamp', 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
-            ->where(['hour_timestamp >=' => $startDate, 'hour_timestamp < ' => $endDate])
-            ->group(['hour_timestamp'])
-            ->toArray();
-        $this->set(compact('summaryHourly', 'totalTestsBreakdown'));
+        $this->set(compact('summaryHourly', 'totalTestsBreakdown', 'companyBreakdown', 'companyNames', 'totalTestCount', 'totalCompanyTests', 'totalPSTN', 'totalGSM', 'avgTests', 'filters', 'drStartDate', 'drEndDate', 'testTypes', 'currentCompanyTotals', 'previousCompanyTotals', 'currentTotalTests', 'previousTotalTests'));
     }
 }
