@@ -10,9 +10,9 @@
 <?= $this->Form->hidden('company_names',['id'=>'company_names', 'value'=>json_encode($companyNames)]) ?>
 <?= $this->Form->hidden('test_types',['id'=>'test_types', 'value'=>json_encode($testTypes)]) ?>
 <?= $this->Form->hidden('total_test_count',['id'=>'total_test_count', 'value'=>json_encode($totalTestCount)]) ?>
-<?= $this->Form->hidden('current_company_totals',['id'=>'current_company_totals', 'value'=>json_encode($currentCompanyTotals)]) ?>
-<?= $this->Form->hidden('previous_company_totals',['id'=>'previous_company_totals', 'value'=>json_encode($previousCompanyTotals)]) ?>
 <?= $this->Form->hidden('totals_dict',['id'=>'totals_dict', 'value'=>json_encode($totalsDict)]) ?>
+<?= $this->Form->hidden('current_comp_dict',['id'=>'current_comp_dict', 'value'=>json_encode($currentTotalsCompDict)]) ?>
+<?= $this->Form->hidden('previous_comp_dict',['id'=>'previous_comp_dict', 'value'=>json_encode($previousTotalsCompDict)]) ?>
 <?= $this->Form->hidden('current_dict',['id'=>'current_dict', 'value'=>json_encode($currentTotalsDict)]) ?>
 <?= $this->Form->hidden('previous_dict',['id'=>'previous_dict', 'value'=>json_encode($previousTotalsDict)]) ?>
 <div class="container-fluid">

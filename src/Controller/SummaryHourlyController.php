@@ -159,18 +159,28 @@ class SummaryHourlyController extends AppController
         }
 
         $drStartDate = date('Y-m-d 00:00:00', strtotime($startDate));
-        debug($endDate);
         $drEndDate = new \DateTime($endDate);
         $drEndDate = $drEndDate->format('Y-m-d 23:59:59');
         debug($drStartDate);
         debug($drEndDate);
 
         $diff = (new \DateTime($startDate))->diff(new \DateTime($endDate . '+1 day'));
+        debug($diff);
 
-        $previousStartDate = (new \DateTime($drStartDate . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days'))->format('Y-m-d 00:00:00');
-        $previousEndDate = (new \DateTime($drEndDate . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days'))->format('Y-m-d 23:59:59');
-        debug($previousStartDate);
-        debug($previousEndDate);
+        if((date('d', strtotime($drStartDate)) == '01') && (date('d', strtotime($drEndDate)) == date('t', strtotime($drEndDate))) && ($diff->m > 0 && $diff->d == 0)){
+            $previousStartDate = (new \DateTime($drStartDate . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days'))->format('Y-m-d 00:00:00');
+            $previousEndDate = (new \DateTime(date('Y-m-01 00:00:00', strtotime($drEndDate)) . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days'))->format('Y-m-t 23:59:59');
+            debug($previousStartDate);
+            debug($previousEndDate);
+            $previousDiff = (new \DateTime($previousStartDate))->diff(new \DateTime($previousEndDate . '+1 day'));
+        }
+        else{
+            $previousStartDate = (new \DateTime($drStartDate . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days'))->format('Y-m-d 00:00:00');
+            $previousEndDate = (new \DateTime($drEndDate . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days'))->format('Y-m-d 23:59:59');
+            debug($previousStartDate);
+            debug($previousEndDate);
+            $previousDiff = (new \DateTime($previousStartDate))->diff(new \DateTime($previousEndDate . '+1 day'));
+        }
 
         // $previousEndDate = date($drEndDate, strtotime("-1 month"));
         // debug($previousEndDate);
@@ -235,6 +245,9 @@ class SummaryHourlyController extends AppController
                 ->where([$previousTotalCondtions])
                 ->order('hour_timestamp')
                 ->toArray();
+
+            $difference = $diff->days * 24;
+            $prevDifference = $previousDiff->days * 24;
         }
 
         #Daily
@@ -265,6 +278,9 @@ class SummaryHourlyController extends AppController
                 ->where([$previousTotalCondtions])
                 ->order('hour_timestamp')
                 ->toArray();
+
+            $difference = $diff->days;
+            $prevDifference = $previousDiff->days;
         }
 
         #Weekly
@@ -295,6 +311,9 @@ class SummaryHourlyController extends AppController
                 ->where([$previousTotalCondtions])
                 ->order('hour_timestamp')
                 ->toArray();
+
+            $difference = $diff->days / 7;
+            $prevDifference = $previousDiff->days / 7;
         }
 
         // #Monthly
@@ -317,7 +336,7 @@ class SummaryHourlyController extends AppController
             $totalPSTN += $value->total_pstn_calls;
             $totalGSM += $value->total_gsm_calls;
         }
-        $avgTests = (sizeof($totalTestsBreakdown) > 0 ? $totalCompanyTests / sizeof($totalTestsBreakdown) : 0);
+        $avgTests = $totalCompanyTests / $difference;
 
         $totalsDict = array(
             'totalTests' => $totalCompanyTests,
@@ -326,7 +345,6 @@ class SummaryHourlyController extends AppController
             'avgTests' => $avgTests,
         );
 
-        /*Not effected by company filter. Used to find others value. */
         $curTotalTests = 0;
         $currentTotalPSTN = 0;
         $currentTotalGSM = 0;
@@ -336,8 +354,8 @@ class SummaryHourlyController extends AppController
             $currentTotalGSM += $value->total_gsm_calls;
         }
 
-        $currentAvgPSTN = (sizeof($currentTotalTests) > 0 ? $currentTotalPSTN / sizeof($currentTotalTests) : 0);
-        $currentAvgGSM = (sizeof($currentTotalTests) > 0 ? $currentTotalGSM / sizeof($currentTotalTests) : 0);
+        $currentAvgPSTN = $currentTotalPSTN / $difference;
+        $currentAvgGSM = $currentTotalGSM / $difference;
 
         $currentTotalsDict = array(
             'totalTests' => $curTotalTests,
@@ -356,8 +374,8 @@ class SummaryHourlyController extends AppController
             $prevTotalGSM += $value->total_gsm_calls;
         }
 
-        $prevAvgPSTN = (sizeof($previousTotalTests) > 0 ? $prevTotalPSTN / sizeof($previousTotalTests) : 0);
-        $prevAvgGSM = (sizeof($previousTotalTests) > 0 ? $prevTotalGSM / sizeof($previousTotalTests) : 0);
+        $prevAvgPSTN = $prevTotalPSTN / $prevDifference;
+        $prevAvgGSM = $prevTotalGSM / $prevDifference;
 
         $previousTotalsDict = array(
             'totalTests' => $prevTotalTests,
@@ -367,11 +385,25 @@ class SummaryHourlyController extends AppController
             'avgGSM' => $prevAvgGSM
         );
 
+        $previousTotalsCompDict = [];
+        foreach($previousCompanyTotals as $key => $value){
+            $previousTotalsCompDict[$value->company_id] = $value->total / $prevDifference;
+        }
+
+        $currentTotalsCompDict = [];
+        foreach($currentCompanyTotals as $key => $value){
+            $currentTotalsCompDict[$value->company_id] = $value->total / $difference;
+        }
+
+        debug($difference);
+        debug($prevDifference);
+        debug($previousTotalsCompDict);
+        debug($currentTotalsCompDict);
         debug($totalsDict);
         debug($currentTotalsDict);
         debug($previousTotalsDict);
 
         $filters = $this->SummaryHourly->getFilters();
-        $this->set(compact('summaryHourly', 'totalTestsBreakdown', 'companyBreakdown', 'companyNames', 'totalTestCount', 'filters', 'drStartDate', 'drEndDate', 'testTypes', 'currentCompanyTotals', 'previousCompanyTotals', 'totalsDict', 'currentTotalsDict', 'previousTotalsDict'));
+        $this->set(compact('summaryHourly', 'totalTestsBreakdown', 'companyBreakdown', 'companyNames', 'totalTestCount', 'filters', 'drStartDate', 'drEndDate', 'testTypes', 'totalsDict', 'currentTotalsCompDict', 'previousTotalsCompDict', 'currentTotalsDict', 'previousTotalsDict'));
     }
 }

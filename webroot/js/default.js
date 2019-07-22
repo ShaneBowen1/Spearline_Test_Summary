@@ -293,9 +293,9 @@ $(document).ready(function(){
     var test_types = JSON.parse($('#test_types').val());
     var search_params = JSON.parse($('#search_params').val());
     var total_test_count = JSON.parse($('#total_test_count').val());
-    var current_company_totals = JSON.parse($('#current_company_totals').val());
-    var previous_company_totals = JSON.parse($('#previous_company_totals').val());
     var totals_dict = JSON.parse($('#totals_dict').val());
+    var current_comp_dict = JSON.parse($('#current_comp_dict').val());
+    var previous_comp_dict = JSON.parse($('#previous_comp_dict').val());
     var current_dict = JSON.parse($('#current_dict').val());
     var previous_dict = JSON.parse($('#previous_dict').val());
     console.log(total_tests_breakdown);
@@ -303,8 +303,6 @@ $(document).ready(function(){
     console.log(company_names);
     console.log(test_types);
     console.log(total_test_count);
-    console.log(previous_company_totals);
-    console.log(current_company_totals);
     
     google.charts.load('current', {'packages':['corechart']});
     if(typeof search_params['company'] == 'undefined'){
@@ -403,7 +401,6 @@ $(document).ready(function(){
         chart.draw(data, options);
 
         if(previous_dict['totalTests'] > 0){
-            console.log("Ok");
             diff = current_dict['avgPSTN'] - previous_dict['avgPSTN']
             percent = Math.round(((diff / previous_dict['avgPSTN']) * 100) * 100) / 100;
             percent = percent || 0;
@@ -562,24 +559,22 @@ $(document).ready(function(){
             return b.localeCompare(a);
         });
         console.log(selectedCompNames);
-        console.log(previous_company_totals);
-        console.log(current_company_totals);
 
         var percentDict = {};
         var previous_company_total = 0;
         for(var i=0; i<selectedCompIds.length; i++){
-            if((typeof current_company_totals[i] != 'undefined') && (typeof previous_company_totals[i] != 'undefined')){
-                var diff = current_company_totals[i]['total'] - previous_company_totals[i]['total'];
-                previous_company_total += parseFloat(previous_company_totals[i]['total']);
-                var percent = Math.round(((diff / previous_company_totals[i]['total']) * 100) * 100) / 100;
+            if((typeof current_comp_dict[selectedCompIds[i]] != 'undefined') && (typeof previous_comp_dict[selectedCompIds[i]] != 'undefined')){
+                var diff = current_comp_dict[selectedCompIds[i]] - previous_comp_dict[selectedCompIds[i]];
+                previous_company_total += parseFloat(previous_comp_dict[selectedCompIds[i]]);
+                var percent = Math.round(((diff / previous_comp_dict[selectedCompIds[i]]) * 100) * 100) / 100;
                 percent = percent || 0;
+                console.log(percent);
                 percentDict[companyNames[selectedCompIds[i]]] = percent;
             }
             else{
                 percentDict[companyNames[selectedCompIds[i]]] = 0;
             }
         }
-
         console.log(percentDict);
         console.log(previous_company_total);
         if(selectedCompIds.length > 5){ //Add others percentage value
