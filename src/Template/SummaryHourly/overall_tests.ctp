@@ -10,11 +10,11 @@
 <?= $this->Form->hidden('company_names',['id'=>'company_names', 'value'=>json_encode($companyNames)]) ?>
 <?= $this->Form->hidden('test_types',['id'=>'test_types', 'value'=>json_encode($testTypes)]) ?>
 <?= $this->Form->hidden('total_test_count',['id'=>'total_test_count', 'value'=>json_encode($totalTestCount)]) ?>
-<?= $this->Form->hidden('totals_dict',['id'=>'totals_dict', 'value'=>json_encode($totalsDict)]) ?>
-<?= $this->Form->hidden('current_comp_dict',['id'=>'current_comp_dict', 'value'=>json_encode($currentTotalsCompDict)]) ?>
-<?= $this->Form->hidden('previous_comp_dict',['id'=>'previous_comp_dict', 'value'=>json_encode($previousTotalsCompDict)]) ?>
-<?= $this->Form->hidden('current_dict',['id'=>'current_dict', 'value'=>json_encode($currentTotalsDict)]) ?>
-<?= $this->Form->hidden('previous_dict',['id'=>'previous_dict', 'value'=>json_encode($previousTotalsDict)]) ?>
+<?= $this->Form->hidden('total_tests_array',['id'=>'total_tests_array', 'value'=>json_encode($totalTestsArray)]) ?>
+<?= $this->Form->hidden('current_company_avg_tests',['id'=>'current_company_avg_tests', 'value'=>json_encode($currentCompanyAvgTests)]) ?>
+<?= $this->Form->hidden('previous_company_avg_tests',['id'=>'previous_company_avg_tests', 'value'=>json_encode($previousCompanyAvgTests)]) ?>
+<?= $this->Form->hidden('current_overall_tests',['id'=>'current_overall_tests', 'value'=>json_encode($currentOverallTests)]) ?>
+<?= $this->Form->hidden('previous_overall_tests',['id'=>'previous_overall_tests', 'value'=>json_encode($previousOverallTests)]) ?>
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="span12">
@@ -116,6 +116,11 @@
                     ?>
                     <div class="span2">
                         <div class="input text">       
+                            <?= $this->Form->input('time_interval', ['id'=>'time_interval', 'options'=>['1'=>'Hourly', '2'=>'Daily', '3'=>'Weekly', '4'=>'Monthly'], 'label'=>false, 'required'=>'required']); ?>
+                        </div>
+                    </div>
+                    <div class="span2">
+                        <div class="input text">       
                             <?= $this->Form->input('date', ['id'=>'date', 'placeholder'=>'Select Date Range', 'class'=>'customDateTimeRangePicker', 'label'=>false, 'required'=>'required', 'value'=>'{"start":"'.$drStartDate.'","end":"'.$drEndDate.'"}']); ?>
                         </div>
                     </div>
@@ -149,10 +154,10 @@
                     <body>
                         <div id="chart_div" style="width: 1950px; height: 600px; z-index: 2;"></div>
                             <div class="total-container">
-                                <div style="font-family:'Arial Black'; font-size: 16px; margin-right: 15px">Total Tests: <?= number_format($totalsDict['totalTests']) ?></div>
-                                <div style="font-family:'Arial Black'; font-size: 16px; margin-right: 15px">Total PSTN: <?= number_format($totalsDict['totalPSTN']) ?></div>
-                                <div style="font-family:'Arial Black'; font-size: 16px; margin-right: 15px">Total GSM: <?= number_format($totalsDict['totalGSM']) ?></div>
-                                <div style="font-family:'Arial Black'; font-size: 16px;">Avg Tests: <?= number_format($totalsDict['avgTests'], 2) ?></div>
+                                <div style="font-family:'Arial Black'; font-size: 16px; margin-right: 15px">Total Tests: <?= number_format($totalTestsArray['totalTests']) ?></div>
+                                <div style="font-family:'Arial Black'; font-size: 16px; margin-right: 15px">Total PSTN: <?= number_format($totalTestsArray['totalPSTN']) ?></div>
+                                <div style="font-family:'Arial Black'; font-size: 16px; margin-right: 15px">Total GSM: <?= number_format($totalTestsArray['totalGSM']) ?></div>
+                                <div style="font-family:'Arial Black'; font-size: 16px;">Avg Tests: <?= number_format($totalTestsArray['avgTests'], 2) ?></div>
                             </div>
                         </div>
                     </body>

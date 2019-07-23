@@ -293,11 +293,11 @@ $(document).ready(function(){
     var test_types = JSON.parse($('#test_types').val());
     var search_params = JSON.parse($('#search_params').val());
     var total_test_count = JSON.parse($('#total_test_count').val());
-    var totals_dict = JSON.parse($('#totals_dict').val());
-    var current_comp_dict = JSON.parse($('#current_comp_dict').val());
-    var previous_comp_dict = JSON.parse($('#previous_comp_dict').val());
-    var current_dict = JSON.parse($('#current_dict').val());
-    var previous_dict = JSON.parse($('#previous_dict').val());
+    var total_tests_array = JSON.parse($('#total_tests_array').val());
+    var current_overall_tests = JSON.parse($('#current_overall_tests').val());
+    var previous_overall_tests = JSON.parse($('#previous_overall_tests').val());
+    var current_company_avg_tests = JSON.parse($('#current_company_avg_tests').val());
+    var previous_company_avg_tests = JSON.parse($('#previous_company_avg_tests').val());
     console.log(total_tests_breakdown);
     console.log(company_breakdown);
     console.log(company_names);
@@ -330,8 +330,6 @@ $(document).ready(function(){
         $("[name='company'] .quantity").text('');
     }
 
-    const total_test_list = groupBy(company_breakdown, test => JSON.stringify({hour_timestamp: test.hour_timestamp}));
-    
     function drawLineChart() {
         var data = new google.visualization.DataTable();
         var ticks = [];
@@ -400,14 +398,14 @@ $(document).ready(function(){
         var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
         chart.draw(data, options);
 
-        if(previous_dict['totalTests'] > 0){
-            diff = current_dict['avgPSTN'] - previous_dict['avgPSTN']
-            percent = Math.round(((diff / previous_dict['avgPSTN']) * 100) * 100) / 100;
+        if(previous_overall_tests['totalTests'] > 0){
+            diff = current_overall_tests['avgPSTN'] - previous_overall_tests['avgPSTN']
+            percent = Math.round(((diff / previous_overall_tests['avgPSTN']) * 100) * 100) / 100;
             percent = percent || 0;
             percentArray.push(percent);
 
-            diff = current_dict['avgGSM'] - previous_dict['avgGSM']
-            percent = Math.round(((diff / previous_dict['avgGSM']) * 100) * 100) / 100;
+            diff = current_overall_tests['avgGSM'] - previous_overall_tests['avgGSM']
+            percent = Math.round(((diff / previous_overall_tests['avgGSM']) * 100) * 100) / 100;
             percent = percent || 0;
             percentArray.push(percent);
         }
@@ -461,7 +459,9 @@ $(document).ready(function(){
         var index = 0;
         var k = 0;
         var selectedCompNames = [];
-        var percentArray = []
+        var percentArray = [];
+
+        const total_test_list = groupBy(company_breakdown, test => JSON.stringify({hour_timestamp: test.hour_timestamp}));
 
         var companyNames = {};
         for(i = 0; i<company_names.length; i++){
@@ -544,7 +544,8 @@ $(document).ready(function(){
             isStacked: true,
             backgroundColor:'transparent',
             focusTarget: 'category',
-            chartArea: {  width: "72%" }
+            chartArea: {  width: "72%" },
+            curveType: 'function'
             // pointSize: 3,
             // interpolateNulls: true
         };
@@ -563,10 +564,10 @@ $(document).ready(function(){
         var percentDict = {};
         var previous_company_total = 0;
         for(var i=0; i<selectedCompIds.length; i++){
-            if((typeof current_comp_dict[selectedCompIds[i]] != 'undefined') && (typeof previous_comp_dict[selectedCompIds[i]] != 'undefined')){
-                var diff = current_comp_dict[selectedCompIds[i]] - previous_comp_dict[selectedCompIds[i]];
-                previous_company_total += parseFloat(previous_comp_dict[selectedCompIds[i]]);
-                var percent = Math.round(((diff / previous_comp_dict[selectedCompIds[i]]) * 100) * 100) / 100;
+            if((typeof current_company_avg_tests[selectedCompIds[i]] != 'undefined') && (typeof previous_company_avg_tests[selectedCompIds[i]] != 'undefined')){
+                var diff = current_company_avg_tests[selectedCompIds[i]] - previous_company_avg_tests[selectedCompIds[i]];
+                previous_company_total += parseFloat(previous_company_avg_tests[selectedCompIds[i]]);
+                var percent = Math.round(((diff / previous_company_avg_tests[selectedCompIds[i]]) * 100) * 100) / 100;
                 percent = percent || 0;
                 console.log(percent);
                 percentDict[companyNames[selectedCompIds[i]]] = percent;
@@ -578,8 +579,8 @@ $(document).ready(function(){
         console.log(percentDict);
         console.log(previous_company_total);
         if(selectedCompIds.length > 5){ //Add others percentage value
-            var diff = ((current_dict['totalTests']) - totals_dict['totalTests']) - ((previous_dict['totalTests']) - previous_company_total);
-            var percent = Math.round(((diff / ((previous_dict['totalTests']) - previous_company_total)) * 100) * 100) / 100;
+            var diff = ((current_overall_tests['totalTests']) - total_tests_array['totalTests']) - ((previous_overall_tests['totalTests']) - previous_company_total);
+            var percent = Math.round(((diff / ((previous_overall_tests['totalTests']) - previous_company_total)) * 100) * 100) / 100;
             percent = percent || 0;
             percentArray.push(percent);
         }

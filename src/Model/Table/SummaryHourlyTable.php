@@ -71,6 +71,11 @@ class SummaryHourlyTable extends Table
                     }
                 }
             ])
+            ->add('time_interval', 'Search.Callback', [
+                'callback' => function ($query, $args, $filter) {
+                    $time_interval = json_decode($args['time_interval']);
+                }
+            ])
              ->add('date', 'Search.Callback', [
                  'callback' => function ($query, $args, $filter) {
                      if($args['date'] === 'NULL') {

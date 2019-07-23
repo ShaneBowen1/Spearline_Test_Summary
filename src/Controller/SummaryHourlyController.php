@@ -125,16 +125,20 @@ class SummaryHourlyController extends AppController
         #Load Models
         $this->loadModel('Company');
         $this->loadModel('TestType');
+
+        $companyBreakdown = [];
+        $currentCompanyTotals = [];
+        $previousCompanyTotals = [];
         
         $companyNames = $this->Company->find('all')
-        ->SELECT(['id'=>'id', 'name'=>'name'])
-        ->order('name')
-        ->toArray();
+            ->SELECT(['id'=>'id', 'name'=>'name'])
+            ->order('name')
+            ->toArray();
 
         $testTypes = $this->TestType->find('all')
-        ->SELECT(['id'=>'id', 'test_type'=>'test_type'])
-        ->order('test_type')
-        ->toArray();
+            ->SELECT(['id'=>'id', 'test_type'=>'test_type'])
+            ->order('test_type')
+            ->toArray();
 
         /*If no daterange selected in filter then show results for current week only*/
         if(empty($this->request->query['date'])){
@@ -158,33 +162,29 @@ class SummaryHourlyController extends AppController
             }
         }
 
+        if(empty($this->request->query['time_interval'])){
+            $timeInterval = '1';
+        }
+        if(isset($this->request->query['time_interval'])){
+            $timeInterval = $this->request->query['time_interval'];
+        }
+        
         $drStartDate = date('Y-m-d 00:00:00', strtotime($startDate));
         $drEndDate = new \DateTime($endDate);
         $drEndDate = $drEndDate->format('Y-m-d 23:59:59');
-        debug($drStartDate);
-        debug($drEndDate);
-
         $diff = (new \DateTime($startDate))->diff(new \DateTime($endDate . '+1 day'));
-        debug($diff);
 
+        //Check if date selected is a full month
         if((date('d', strtotime($drStartDate)) == '01') && (date('d', strtotime($drEndDate)) == date('t', strtotime($drEndDate))) && ($diff->m > 0 && $diff->d == 0)){
             $previousStartDate = (new \DateTime($drStartDate . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days'))->format('Y-m-d 00:00:00');
             $previousEndDate = (new \DateTime(date('Y-m-01 00:00:00', strtotime($drEndDate)) . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days'))->format('Y-m-t 23:59:59');
-            debug($previousStartDate);
-            debug($previousEndDate);
             $previousDiff = (new \DateTime($previousStartDate))->diff(new \DateTime($previousEndDate . '+1 day'));
         }
         else{
             $previousStartDate = (new \DateTime($drStartDate . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days'))->format('Y-m-d 00:00:00');
             $previousEndDate = (new \DateTime($drEndDate . '-' . $diff->y . 'years -' . $diff->m . 'months -' . $diff->d . 'days'))->format('Y-m-d 23:59:59');
-            debug($previousStartDate);
-            debug($previousEndDate);
             $previousDiff = (new \DateTime($previousStartDate))->diff(new \DateTime($previousEndDate . '+1 day'));
         }
-
-        // $previousEndDate = date($drEndDate, strtotime("-1 month"));
-        // debug($previousEndDate);
-
         $companyConditions = ['hour_timestamp >=' => $previousStartDate, 'hour_timestamp < ' => $previousEndDate];
         $currentTotalCondtions = ['hour_timestamp >=' => $drStartDate, 'hour_timestamp < ' => $drEndDate];
         $previousTotalCondtions = ['hour_timestamp >=' => $previousStartDate, 'hour_timestamp < ' => $previousEndDate];
@@ -198,212 +198,196 @@ class SummaryHourlyController extends AppController
             $previousTotalCondtions += ['test_type_id IN' => $this->request->query['test_type']];
         }
 
-        $currentCompanyTotals = $this->SummaryHourly->find('search', ['search' => $this->request->query])
-            ->SELECT(['hour_timestamp'=>'hour_timestamp', 'company_id'=>'company_id', 'total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
-            ->group(['company_id'])
-            ->order('company_id')
-            ->toArray();
-        $previousCompanyTotals = $this->SummaryHourly->find('all')
-            ->SELECT(['hour_timestamp'=>'hour_timestamp', 'company_id'=>'company_id', 'total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
-            ->group(['company_id'])
-            ->where([$companyConditions])
-            ->order('company_id')
-            ->toArray();
-
-        // $currentTotalTests = $this->SummaryHourly->find('all')
-        //     ->SELECT(['hour_timestamp'=>'hour_timestamp', 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
-        //     ->where([$currentTotalCondtions]);
-        // $previousTotalTests = $this->SummaryHourly->find('all')
-        //     ->SELECT(['hour_timestamp'=>'hour_timestamp', 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
-        //     ->where([$previousTotalCondtions]);
-
-        #Hourly
-        if($diff->y == 0 && $diff->m == 0 && $diff->d <= 7){
-            $totalTestsBreakdown = $this->SummaryHourly->find('search', ['search' => $this->request->query])
-                ->SELECT(['hour_timestamp'=>'hour_timestamp', 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
-                ->group(['hour_timestamp'])
-                ->order('hour_timestamp')
-                ->toArray();
-            $companyBreakdown = $this->SummaryHourly->find('search', ['search' => $this->request->query])
+        if(isset($this->request->query['company'])){
+            $currentCompanyTotals = $this->SummaryHourly->find('search', ['search' => $this->request->query])
                 ->SELECT(['hour_timestamp'=>'hour_timestamp', 'company_id'=>'company_id', 'total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
-                ->group(['hour_timestamp', 'company_id'])
-                ->order('hour_timestamp')
+                ->group(['company_id'])
+                ->order('company_id')
                 ->toArray();
+            $previousCompanyTotals = $this->SummaryHourly->find('all')
+                ->SELECT(['hour_timestamp'=>'hour_timestamp', 'company_id'=>'company_id', 'total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
+                ->group(['company_id'])
+                ->where([$companyConditions])
+                ->order('company_id')
+                ->toArray();
+        }
+        
+        $currentTotalTests = $this->SummaryHourly->find('all')
+            ->SELECT(['hour_timestamp'=>'hour_timestamp', 'total_tests' => 'SUM(`total_pstn_calls`) + SUM(`total_gsm_calls`)', 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
+            ->where([$currentTotalCondtions])
+            ->toArray();
+        $previousTotalTests = $this->SummaryHourly->find('all')
+            ->SELECT(['hour_timestamp'=>'hour_timestamp', 'total_tests' => 'SUM(`total_pstn_calls`) + SUM(`total_gsm_calls`)', 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
+            ->where([$previousTotalCondtions])
+            ->toArray();
+
+        #Hourly  
+        if(($timeInterval == '1')){
+            if(isset($this->request->query['company'])){
+                #Check amount of companies and time range to prevent memory issue
+                if(sizeof($this->request->query['company']) <= 5 && ($diff->y == 0 && $diff->m <= 6)){
+                    $totalTestsBreakdown = $this->SummaryHourly->find('search', ['search' => $this->request->query])
+                        ->SELECT(['hour_timestamp'=>'hour_timestamp', 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
+                        ->group(['hour_timestamp'])
+                        ->order('hour_timestamp')
+                        ->toArray();
+
+                    $companyBreakdown = $this->SummaryHourly->find('search', ['search' => $this->request->query])
+                        ->SELECT(['hour_timestamp'=>'hour_timestamp', 'company_id'=>'company_id', 'total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
+                        ->group(['hour_timestamp', 'company_id'])
+                        ->order('hour_timestamp')
+                        ->toArray();
+                }
+                else{
+                    $totalTestsBreakdown = $this->SummaryHourly->find('search', ['search' => $this->request->query])
+                    ->SELECT(['hour_timestamp'=>"DATE_FORMAT(`hour_timestamp`, '%Y-%m-%d 00:00:00')", 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
+                    ->group(["DATE_FORMAT(`hour_timestamp`, '%Y-%m-%d')"])
+                    ->order('hour_timestamp')
+                    ->toArray();
+
+                    $companyBreakdown = $this->SummaryHourly->find('search', ['search' => $this->request->query])
+                        ->SELECT(['hour_timestamp'=>"DATE_FORMAT(`hour_timestamp`, '%Y-%m-%d 00:00:00')", 'company_id'=>'company_id', 'total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
+                        ->group(["DATE_FORMAT(`hour_timestamp`, '%Y-%m-%d')", 'company_id'])
+                        ->order('hour_timestamp')
+                        ->toArray();
+                }
+            }
+            else{
+                $totalTestsBreakdown = $this->SummaryHourly->find('search', ['search' => $this->request->query])
+                    ->SELECT(['hour_timestamp'=>'hour_timestamp', 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
+                    ->group(['hour_timestamp'])
+                    ->order('hour_timestamp')
+                    ->toArray();
+            }
             $totalTestCount = $this->SummaryHourly->find('all')
                 ->select(['total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
                 ->group(['hour_timestamp'])
                 ->where(['hour_timestamp >=' => $startDate, 'hour_timestamp < ' => $endDate]);
-            $currentTotalTests = $this->SummaryHourly->find('all')
-                ->SELECT(['hour_timestamp'=>'hour_timestamp', 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
-                ->where([$currentTotalCondtions])
-                ->group(['hour_timestamp'])
-                ->order('hour_timestamp')
-                ->toArray();
-            $previousTotalTests = $this->SummaryHourly->find('all')
-                ->SELECT(['hour_timestamp'=>'hour_timestamp', 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
-                ->group(['hour_timestamp'])
-                ->where([$previousTotalCondtions])
-                ->order('hour_timestamp')
-                ->toArray();
-
-            $difference = $diff->days * 24;
-            $prevDifference = $previousDiff->days * 24;
         }
 
         #Daily
-        elseif ($diff->y == 0 && (($diff->m >=0 && $diff->m < 3) || ($diff->m == 3 && $diff->d == 0))) {
+        elseif ($timeInterval == '2'){
             $totalTestsBreakdown = $this->SummaryHourly->find('search', ['search' => $this->request->query])
                 ->SELECT(['hour_timestamp'=>"DATE_FORMAT(`hour_timestamp`, '%Y-%m-%d 00:00:00')", 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
                 ->group(["DATE_FORMAT(`hour_timestamp`, '%Y-%m-%d')"])
                 ->order('hour_timestamp')
                 ->toArray();
-            $companyBreakdown = $this->SummaryHourly->find('search', ['search' => $this->request->query])
-                ->SELECT(['hour_timestamp'=>"DATE_FORMAT(`hour_timestamp`, '%Y-%m-%d 00:00:00')", 'company_id'=>'company_id', 'total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
-                ->group(["DATE_FORMAT(`hour_timestamp`, '%Y-%m-%d')", 'company_id'])
-                ->order('hour_timestamp')
-                ->toArray();
+            if(isset($this->request->query['company'])){
+                $companyBreakdown = $this->SummaryHourly->find('search', ['search' => $this->request->query])
+                    ->SELECT(['hour_timestamp'=>"DATE_FORMAT(`hour_timestamp`, '%Y-%m-%d 00:00:00')", 'company_id'=>'company_id', 'total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
+                    ->group(["DATE_FORMAT(`hour_timestamp`, '%Y-%m-%d')", 'company_id'])
+                    ->order('hour_timestamp')
+                    ->toArray();
+            }
             $totalTestCount = $this->SummaryHourly->find('all')
                 ->select(['total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
                 ->group(["DATE_FORMAT(`hour_timestamp`, '%Y-%m-%d')"])
                 ->where(['hour_timestamp >=' => $startDate, 'hour_timestamp < ' => $endDate]);
-            $currentTotalTests = $this->SummaryHourly->find('all')
-                ->SELECT(['hour_timestamp'=>"DATE_FORMAT(`hour_timestamp`, '%Y-%m-%d 00:00:00')", 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
-                ->where([$currentTotalCondtions])
-                ->group(["DATE_FORMAT(`hour_timestamp`, '%Y-%m-%d')"])
-                ->order('hour_timestamp')
-                ->toArray();
-            $previousTotalTests = $this->SummaryHourly->find('all')
-                ->SELECT(['hour_timestamp'=>"DATE_FORMAT(`hour_timestamp`, '%Y-%m-%d 00:00:00')", 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
-                ->group(["DATE_FORMAT(`hour_timestamp`, '%Y-%m-%d')"])
-                ->where([$previousTotalCondtions])
-                ->order('hour_timestamp')
-                ->toArray();
-
-            $difference = $diff->days;
-            $prevDifference = $previousDiff->days;
         }
 
         #Weekly
-        elseif ($diff->m >= 3 || $diff->y >= 1) {
+        elseif ($timeInterval == '3'){
             $totalTestsBreakdown = $this->SummaryHourly->find('search', ['search' => $this->request->query])
                 ->SELECT(['hour_timestamp'=>"DATE_FORMAT(`hour_timestamp` - INTERVAL (DAYOFWEEK(`hour_timestamp`) - 1) DAY, '%Y-%m-%d 00:00:00')", 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
                 ->group(["WEEK(DATE_FORMAT('hour_timestamp', '%Y-%m-%d'))", 'DATE_FORMAT(`hour_timestamp` - INTERVAL (DAYOFWEEK(`hour_timestamp`) - 1) DAY, "%Y-%m-%d 00:00:00")'])
                 ->order('hour_timestamp')
                 ->toArray();
-            $companyBreakdown = $this->SummaryHourly->find('search', ['search' => $this->request->query])
-                ->SELECT(['hour_timestamp'=>"DATE_FORMAT(`hour_timestamp` - INTERVAL (DAYOFWEEK(`hour_timestamp`) - 1) DAY, '%Y-%m-%d 00:00:00')", 'company_id'=>'company_id', 'total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
-                ->group(["WEEK(DATE_FORMAT('hour_timestamp', '%Y-%m-%d'))", 'DATE_FORMAT(`hour_timestamp` - INTERVAL (DAYOFWEEK(`hour_timestamp`) - 1) DAY, "%Y-%m-%d 00:00:00")', 'company_id'])
-                ->order('hour_timestamp')
-                ->toArray();
+            if(isset($this->request->query['company'])){
+                $companyBreakdown = $this->SummaryHourly->find('search', ['search' => $this->request->query])
+                    ->SELECT(['hour_timestamp'=>"DATE_FORMAT(`hour_timestamp` - INTERVAL (DAYOFWEEK(`hour_timestamp`) - 1) DAY, '%Y-%m-%d 00:00:00')", 'company_id'=>'company_id', 'total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
+                    ->group(["WEEK(DATE_FORMAT('hour_timestamp', '%Y-%m-%d'))", 'DATE_FORMAT(`hour_timestamp` - INTERVAL (DAYOFWEEK(`hour_timestamp`) - 1) DAY, "%Y-%m-%d 00:00:00")', 'company_id'])
+                    ->order('hour_timestamp')
+                    ->toArray();
+            }
             $totalTestCount = $this->SummaryHourly->find('all')
                 ->select(['total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
                 ->group(["WEEK(DATE_FORMAT('hour_timestamp', '%Y-%m-%d'))", 'DATE_FORMAT(`hour_timestamp` - INTERVAL (DAYOFWEEK(`hour_timestamp`) - 1) DAY, "%Y-%m-%d 00:00:00")'])
                 ->where(['hour_timestamp >=' => $startDate, 'hour_timestamp < ' => $endDate]);
-            $currentTotalTests = $this->SummaryHourly->find('all')
-                ->SELECT(['hour_timestamp'=>"DATE_FORMAT(`hour_timestamp` - INTERVAL (DAYOFWEEK(`hour_timestamp`) - 1) DAY, '%Y-%m-%d 00:00:00')", 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
-                ->where([$currentTotalCondtions])
-                ->group(["WEEK(DATE_FORMAT('hour_timestamp', '%Y-%m-%d'))", 'DATE_FORMAT(`hour_timestamp` - INTERVAL (DAYOFWEEK(`hour_timestamp`) - 1) DAY, "%Y-%m-%d 00:00:00")'])
-                ->order('hour_timestamp')
-                ->toArray();
-            $previousTotalTests = $this->SummaryHourly->find('all')
-                ->SELECT(['hour_timestamp'=>"DATE_FORMAT(`hour_timestamp` - INTERVAL (DAYOFWEEK(`hour_timestamp`) - 1) DAY, '%Y-%m-%d 00:00:00')", 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
-                ->group(["WEEK(DATE_FORMAT('hour_timestamp', '%Y-%m-%d'))", 'DATE_FORMAT(`hour_timestamp` - INTERVAL (DAYOFWEEK(`hour_timestamp`) - 1) DAY, "%Y-%m-%d 00:00:00")'])
-                ->where([$previousTotalCondtions])
-                ->order('hour_timestamp')
-                ->toArray();
-
-            $difference = $diff->days / 7;
-            $prevDifference = $previousDiff->days / 7;
         }
 
-        // #Monthly
-        // elseif ($diff->y > 0) {
-        //     $totalTestsBreakdown = $this->SummaryHourly->find('search', ['search' => $this->request->query])
-        //     ->SELECT(['hour_timestamp'=>"DATE_FORMAT(`hour_timestamp`, '%Y-%m-01 00:00:00')", 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
-        //     ->group(["DATE_FORMAT(`hour_timestamp`, '%Y-%m')"])
-        //     ->toArray();
-        //     $companyBreakdown = $this->SummaryHourly->find('search', ['search' => $this->request->query])
-        //         ->SELECT(['hour_timestamp'=>"DATE_FORMAT(`hour_timestamp`, '%Y-%m-01 00:00:00')", 'company_id'=>'company_id', 'total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
-        //         ->group(["DATE_FORMAT(`hour_timestamp`, '%Y-%m')", 'company_id'])
-        //         ->toArray();
-        // }
+        #Monthly
+        elseif ($timeInterval == '4'){
+            $totalTestsBreakdown = $this->SummaryHourly->find('search', ['search' => $this->request->query])
+                ->SELECT(['hour_timestamp'=>"DATE_FORMAT(`hour_timestamp`, '%Y-%m-01 00:00:00')", 'total_pstn_calls'=>'SUM(total_pstn_calls)', 'total_gsm_calls'=>'SUM(total_gsm_calls)'])
+                ->group(["DATE_FORMAT(`hour_timestamp`, '%Y-%m')"])
+                ->order('hour_timestamp')
+                ->toArray();
+            if(isset($this->request->query['company'])){
+                $companyBreakdown = $this->SummaryHourly->find('search', ['search' => $this->request->query])
+                    ->SELECT(['hour_timestamp'=>"DATE_FORMAT(`hour_timestamp`, '%Y-%m-01 00:00:00')", 'company_id'=>'company_id', 'total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
+                    ->group(["DATE_FORMAT(`hour_timestamp`, '%Y-%m')", 'company_id'])
+                    ->order('hour_timestamp')
+                    ->toArray();
+            }
+            $totalTestCount = $this->SummaryHourly->find('all')
+                ->select(['total'=>'(SUM(total_pstn_calls) + SUM(total_gsm_calls))'])
+                ->group(["DATE_FORMAT(`hour_timestamp`, '%Y-%m')"])
+                ->where(['hour_timestamp >=' => $startDate, 'hour_timestamp < ' => $endDate]);
+        }
 
-        $totalCompanyTests = 0;
+        $diff = $diff->days;
+        $previousDiff = $previousDiff->days;
+
+        $totalTests = 0;
         $totalPSTN = 0;
         $totalGSM = 0;
         foreach($totalTestsBreakdown as $key => $value ){
-            $totalCompanyTests += $value->total_pstn_calls + $value->total_gsm_calls;
+            $totalTests += $value->total_pstn_calls + $value->total_gsm_calls;
             $totalPSTN += $value->total_pstn_calls;
             $totalGSM += $value->total_gsm_calls;
         }
-        $avgTests = $totalCompanyTests / $difference;
+        $avgTests = (sizeof($totalTestsBreakdown) > 0 ? $totalTests / sizeof($totalTestsBreakdown) : 0);
 
-        $totalsDict = array(
-            'totalTests' => $totalCompanyTests,
+        $totalTestsArray = array(
+            'totalTests' => $totalTests,
             'totalPSTN' => $totalPSTN,
             'totalGSM' => $totalGSM,
             'avgTests' => $avgTests,
         );
+        $avgPSTN = $currentTotalTests[0]['total_pstn_calls'] / $diff;
+        $avgGSM = $currentTotalTests[0]['total_gsm_calls'] / $diff;
 
-        $curTotalTests = 0;
-        $currentTotalPSTN = 0;
-        $currentTotalGSM = 0;
-        foreach($currentTotalTests as $key => $value ){
-            $curTotalTests += ($value->total_pstn_calls + $value->total_gsm_calls);
-            $currentTotalPSTN += $value->total_pstn_calls;
-            $currentTotalGSM += $value->total_gsm_calls;
-        }
-
-        $currentAvgPSTN = $currentTotalPSTN / $difference;
-        $currentAvgGSM = $currentTotalGSM / $difference;
-
-        $currentTotalsDict = array(
-            'totalTests' => $curTotalTests,
-            'totalPSTN' => $currentTotalPSTN,
-            'totalGSM' => $currentTotalGSM,
-            'avgPSTN' => $currentAvgPSTN,
-            'avgGSM' => $currentAvgGSM
+        $currentOverallTests = array(
+            'totalTests' => $currentTotalTests[0]['total_tests'],
+            'totalPSTN' => $currentTotalTests[0]['total_pstn_calls'],
+            'totalGSM' => $currentTotalTests[0]['total_gsm_calls'],
+            'avgPSTN' => $avgPSTN,
+            'avgGSM' => $avgGSM
         );
 
-        $prevTotalTests = 0;
-        $prevTotalPSTN = 0;
-        $prevTotalGSM = 0;
-        foreach($previousTotalTests as $key => $value ){
-            $prevTotalTests += ($value->total_pstn_calls + $value->total_gsm_calls);
-            $prevTotalPSTN += $value->total_pstn_calls;
-            $prevTotalGSM += $value->total_gsm_calls;
-        }
+        $avgPSTN = $previousTotalTests[0]['total_pstn_calls'] / $previousDiff;
+        $avgGSM = $previousTotalTests[0]['total_gsm_calls'] / $previousDiff;
 
-        $prevAvgPSTN = $prevTotalPSTN / $prevDifference;
-        $prevAvgGSM = $prevTotalGSM / $prevDifference;
-
-        $previousTotalsDict = array(
-            'totalTests' => $prevTotalTests,
-            'totalPSTN' => $prevTotalPSTN,
-            'totalGSM' => $prevTotalGSM,
-            'avgPSTN' => $prevAvgPSTN,
-            'avgGSM' => $prevAvgGSM
+        $previousOverallTests = array(
+            'totalTests' => $previousTotalTests[0]['total_tests'],
+            'totalPSTN' => $previousTotalTests[0]['total_pstn_calls'],
+            'totalGSM' => $previousTotalTests[0]['total_gsm_calls'],
+            'avgPSTN' => $avgPSTN,
+            'avgGSM' => $avgGSM
         );
 
-        $previousTotalsCompDict = [];
+        $previousCompanyAvgTests = [];
         foreach($previousCompanyTotals as $key => $value){
-            $previousTotalsCompDict[$value->company_id] = $value->total / $prevDifference;
+            $previousCompanyAvgTests[$value->company_id] = $value->total / $previousDiff;
         }
 
-        $currentTotalsCompDict = [];
+        $currentCompanyAvgTests = [];
         foreach($currentCompanyTotals as $key => $value){
-            $currentTotalsCompDict[$value->company_id] = $value->total / $difference;
+            $currentCompanyAvgTests[$value->company_id] = $value->total / $diff;
         }
 
-        debug($difference);
-        debug($prevDifference);
-        debug($previousTotalsCompDict);
-        debug($currentTotalsCompDict);
-        debug($totalsDict);
-        debug($currentTotalsDict);
-        debug($previousTotalsDict);
+        debug($drStartDate);
+        debug($drEndDate);
+        debug($previousStartDate);
+        debug($previousEndDate);
+
+        // debug($totalTestsArray);
+        // debug($currentOverallTests);
+        // debug($previousOverallTests);
+        // debug($currentCompanyAvgTests);
+        // debug($previousCompanyAvgTests);
 
         $filters = $this->SummaryHourly->getFilters();
-        $this->set(compact('summaryHourly', 'totalTestsBreakdown', 'companyBreakdown', 'companyNames', 'totalTestCount', 'filters', 'drStartDate', 'drEndDate', 'testTypes', 'totalsDict', 'currentTotalsCompDict', 'previousTotalsCompDict', 'currentTotalsDict', 'previousTotalsDict'));
+        $this->set(compact('totalTestsBreakdown', 'companyBreakdown', 'companyNames', 'testTypes', 'totalTestCount', 'filters', 'drStartDate', 'drEndDate', 'totalTestsArray', 'currentOverallTests', 'previousOverallTests', 'currentCompanyAvgTests', 'previousCompanyAvgTests'));
     }
 }
