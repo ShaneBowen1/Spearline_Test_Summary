@@ -376,6 +376,8 @@ class SummaryHourlyController extends AppController
             $currentCompanyAvgTests[$value->company_id] = $value->total / $diff;
         }
 
+        debug($diff);
+
         debug($drStartDate);
         debug($drEndDate);
         debug($previousStartDate);
