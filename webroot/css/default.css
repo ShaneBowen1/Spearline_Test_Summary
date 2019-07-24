@@ -907,14 +907,13 @@ span.editable{
 }
 
 .dropdown-container {
-    /* width: 200px; */
     /* margin: 20px auto 0; */
     font-size: 14px;
     font-family: sans-serif;
     overflow: auto;
-    /* width: max-content; */
     position: absolute;
-    width: 135px;
+    width: 169.65px;
+    margin: -1.5px;
 }
 
 .dropdown-button {
@@ -930,6 +929,9 @@ span.editable{
 
 .dropdown-label, .dropdown-quantity {
     float: left;
+    font-family: montserrat;
+    font-size: 14px;
+    color: #2f3d54;
 }
 
 .dropdown-quantity {
@@ -943,8 +945,8 @@ span.editable{
 .dropdown-list {
     float: left;
     width: 100%;
-    background-color: white;
-    border: 1px solid lightgray;
+    background-color: #fff;
+    border: 1px solid #ccc;
     border-top: none;
     box-sizing: border-box;
     padding: 4px 1px;
@@ -956,9 +958,16 @@ input[type="search"] {
     padding: 5px 0;
 }
 
-.test_types {
+.dropdown-options {
     max-height: 200px;
     overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.dropdown-options label{
+    font-family: montserrat;
+    font-size: 14px;
+    color: #2f3d54;
 }
 
 input[type="checkbox"] {
@@ -984,3 +993,5 @@ input[type="checkbox"] {
 #submit_button:hover{
     background-color: #03a9f4;
 }
+
+.dropdown-options li:hover { background: #EEEDED !important; }

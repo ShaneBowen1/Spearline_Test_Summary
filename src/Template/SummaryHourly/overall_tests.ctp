@@ -38,7 +38,7 @@
                         }
                         $value['options'] = ['' => ''] + $options_v ;
                         } ?>
-                        <div class="span2 widerFilter">
+                        <div class="span2">
                             <div class="dropdown-container" name=<?php echo $value['id']?>>
                                 <div class="dropdown-button noselect">
                                     <div class="dropdown-label"><?php echo $value['name'] ?></div>
@@ -46,7 +46,7 @@
                                 </div>
                                 <div class="dropdown-list" style="display: none;">
                                     <?= $this->Form->input($key, $value);?>
-                                    <ul class="test_types" style="margin: 0">
+                                    <ul class="dropdown-options" style="margin: 0">
                                         <?php if(isset($_GET[$value['id']])){
                                             if($value['id'] == 'test_type'){
                                                 foreach ($testTypes as $value){
@@ -120,8 +120,8 @@
                         </div>
                     </div>
                     <div class="span2">
-                        <div class="input text">       
-                            <?= $this->Form->input('date', ['id'=>'date', 'placeholder'=>'Select Date Range', 'class'=>'customDateTimeRangePicker', 'label'=>false, 'required'=>'required', 'value'=>'{"start":"'.$drStartDate.'","end":"'.$drEndDate.'"}']); ?>
+                        <div class="input text" style="margin: -1.5px">       
+                            <?= $this->Form->input('date', ['id'=>'date', 'placeholder'=>'Select Date Range', 'class'=>'customDateTimeRangePicker', 'label'=>false, 'required'=>'required', 'style' => 'margin: -1.5px', 'value'=>'{"start":"'.$drStartDate.'","end":"'.$drEndDate.'"}']); ?>
                         </div>
                     </div>
                     <div class="span2" style="margin-left:125px; display:flex;">
