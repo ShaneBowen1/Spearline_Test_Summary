@@ -44,21 +44,22 @@
                                     <div class="dropdown-label"><?php echo $value['name'] ?></div>
                                     <div class="dropdown-quantity"><span name=<?php echo $value['id'] ?> class="quantity"></span></div>
                                 </div>
-                                <div class="dropdown-list" style="display: none;">
+                                <div class="dropdown-list" style="display: none;" name=<?php echo $value['id']?>>
+                                    <input class="checkAll" type="button" value="Check All" style="font-size:13px; margin-bottom:3px; border-radius:4px; background-color:#EEEDED; width: inherit;" name=<?php echo $value['id']?>>
                                     <?= $this->Form->input($key, $value);?>
-                                    <ul class="dropdown-options" style="margin: 0">
+                                    <ul class="dropdown-options" style="margin: 0" name=<?php echo $value['id']?>>
                                         <?php if(isset($_GET[$value['id']])){
                                             if($value['id'] == 'test_type'){
                                                 foreach ($testTypes as $value){
                                                     if(in_array($value->id, $_GET["test_type"])) { ?>
-                                                        <li style="list-style-type: none">
+                                                        <li style="list-style-type: none; line-height: 0px; padding: 0px 0px 6px 6px;">
                                                             <input name="test_type[]" value=<?php echo $value->id ?> type="checkbox" style="margin: 0" checked>
                                                             <label for="test_type"><?php echo $value->test_type ?></label>
                                                         </li>
                                                     <?php 
                                                     }
                                                     else { ?>
-                                                        <li style="list-style-type: none">
+                                                        <li style="list-style-type: none; line-height: 0px; padding: 0px 0px 6px 6px;">
                                                             <input name="test_type[]" value=<?php echo $value->id ?> type="checkbox" style="margin: 0">
                                                             <label for="test_type"><?php echo $value->test_type ?></label>
                                                         </li>
@@ -69,14 +70,14 @@
                                             elseif($value['id'] == 'company'){
                                                 foreach ($companyNames as $value){
                                                     if(in_array($value->id, $_GET["company"])) { ?>
-                                                        <li style="list-style-type: none">
+                                                        <li style="list-style-type: none; line-height: 0px; padding: 0px 0px 6px 6px;">
                                                             <input name="company[]" value=<?php echo $value->id ?> type="checkbox" style="margin: 0" checked>
                                                             <label for="company"><?php echo $value->name ?></label>
                                                         </li>
                                                     <?php 
                                                     }
                                                     else { ?>
-                                                        <li style="list-style-type: none">
+                                                        <li style="list-style-type: none; line-height: 0px; padding: 0px 0px 6px 6px;">
                                                             <input name="company[]" value=<?php echo $value->id ?> type="checkbox" style="margin: 0">
                                                             <label for="company"><?php echo $value->name ?></label>
                                                         </li>
@@ -89,7 +90,7 @@
                                         else {
                                             if($value['id'] == 'test_type'){
                                                 foreach ($testTypes as $value){ ?>
-                                                    <li style="list-style-type: none">
+                                                    <li style="list-style-type: none; line-height: 0px; padding: 0px 0px 6px 6px;">
                                                         <input name="test_type[]" value=<?php echo $value->id ?> type="checkbox" style="margin: 0">
                                                         <label for="test_type"><?php echo $value->test_type ?></label>
                                                     </li>
@@ -98,7 +99,7 @@
                                             }
                                             elseif($value['id'] == 'company'){
                                                 foreach ($companyNames as $value){ ?>
-                                                    <li style="list-style-type: none">
+                                                    <li style="list-style-type: none; line-height: 0px; padding: 0px 0px 6px 6px;">
                                                         <input name="company[]" value=<?php echo $value->id ?> type="checkbox" style="margin: 0">
                                                         <label for="company"><?php echo $value->name ?></label>
                                                     </li>
@@ -130,7 +131,8 @@
                                 [
                                     'type' => 'submit',
                                     'id' => 'submit_button'
-                                ]);
+                                ]
+                            );
                         echo $this->Form->button('Reset', 
                                 [
                                     'type' => 'button',

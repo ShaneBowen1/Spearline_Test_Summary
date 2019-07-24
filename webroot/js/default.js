@@ -663,7 +663,6 @@ $(document).ready(function(){
     $("[name='test_type']")
     .on('change', '[type="checkbox"]', function() {
         var container = $(this).closest('.dropdown-container');
-        console.log(container);
         var numChecked = container.find('[type="checkbox"]:checked').length;
         
         if(numChecked > 0){
@@ -677,7 +676,68 @@ $(document).ready(function(){
     $("[name='company']")
     .on('change', '[type="checkbox"]', function() {
         var container = $(this).closest('.dropdown-container');
-        console.log(container);
+        var numChecked2 = container.find('[type="checkbox"]:checked').length;
+        
+        if(numChecked2 > 0){
+           container.find('.quantity').text('(' + numChecked2 + '/' + company_names.length + ')' || '');
+        }
+        else{
+           container.find('.quantity').text('');
+        }
+    });
+
+    /* Anything that gets to the document
+    will hide the dropdown */
+    $(document).click(function(){
+        $(".dropdown-list").hide();
+    });
+
+    /* Clicks within the dropdown won't make
+    it past the dropdown itself */
+    $(".dropdown-container[name='test_type']").click(function(e){
+        e.stopPropagation();
+        $(".dropdown-list[name='company']").hide()
+    });
+
+    /* Clicks within the dropdown won't make
+    it past the dropdown itself */
+    $(".dropdown-container[name='company']").click(function(e){
+        e.stopPropagation();
+        $(".dropdown-list[name='test_type']").hide()
+    });
+
+    $(".checkAll[name='test_type']").click(function() {
+        if($(this).val() == 'Check All'){
+            $(".dropdown-options[name='test_type'] li input").prop('checked', true);
+            $(this).val('Uncheck All');
+        }
+        else{
+            $(".dropdown-options[name='test_type'] li input").prop('checked', false);
+            $(this).val('Check All');
+        }
+
+        var container = $(this).closest('.dropdown-container');
+        var numChecked = container.find('[type="checkbox"]:checked').length;
+        
+        if(numChecked > 0){
+           container.find('.quantity').text('(' + numChecked + '/' + test_types.length + ')' || '');
+        }
+        else{
+           container.find('.quantity').text('');
+        }
+    });
+
+    $(".checkAll[name='company']").click(function() {
+        if($(this).val() == 'Check All'){
+            $(".dropdown-options[name='company'] li input").prop('checked', true);
+            $(this).val('Uncheck All');
+        }
+        else{
+            $(".dropdown-options[name='company'] li input").prop('checked', false);
+            $(this).val('Check All');
+        }
+
+        var container = $(this).closest('.dropdown-container');
         var numChecked2 = container.find('[type="checkbox"]:checked').length;
         
         if(numChecked2 > 0){

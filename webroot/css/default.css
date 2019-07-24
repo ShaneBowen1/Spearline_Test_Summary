@@ -995,3 +995,7 @@ input[type="checkbox"] {
 }
 
 .dropdown-options li:hover { background: #EEEDED !important; }
+
+.dropdown-list.is-open {
+    display: block;
+  }
