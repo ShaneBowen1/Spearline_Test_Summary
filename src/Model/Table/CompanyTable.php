@@ -556,6 +556,49 @@ class CompanyTable extends Table
         return $validator;
     }
 
+    public function isAutomated($company_id)
+    {
+        $query = $this->ApplicationForCompany->find('all');
+        $query->select(['count' => $query->func()->count('*')]);
+        $query->where(['company_id' => $company_id, 'status' => 1, 'application_id !=' => 3]);
+        $count =  $query->first();
+
+        return ($count['count'] > 0);
+    }
+
+    public function isManualAllowed($company_id)
+    {
+        $query = $this->ApplicationForCompany->find('all');
+        $query->where(['company_id' => $company_id, 'status' => 1, 'application_id =' => 3]);
+        $m =  $query->first();
+
+        return $m ? true : false;
+    }
+
+    public function getFiltersRerun($company_id) {
+        $filters = array_keys($this->searchManager()->getFilters());
+        $result = [];
+
+        $this->CountryCode = TableRegistry::get('CountryCode');
+        $countries = $this->CountryCode->find('list')
+            ->where(['status =' => 1])
+            ->order(['country_name' => 'ASC']);
+        $result['country'] = ['options' => $countries, 'label' => false, 'empty' => 'Country'];
+
+        $this->Number = TableRegistry::get('Number');
+        $number = $this->Number->find('list', ['keyField' => 'id', 'valueField' => 'number'])
+            ->where(['status =' => 1, 'company_id' => $company_id]);
+        $result['number'] = ['options' => $number, 'label' => false, 'empty' => 'Number'];
+
+        $this->NumberType = TableRegistry::get('NumberType');
+        $number_type = $this->NumberType->find('list', ['keyField' => 'number_type', 'valueField' => 'number_type'])
+            ->where(['status =' => 1]);
+        $result['number_type'] = ['options' => $number_type, 'label' => false, 'empty' => 'Number Type'];
+
+        return $result;
+
+    }
+
     /**
      * Returns a rules checker object that will be used for validating
      * application integrity.

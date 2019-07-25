@@ -191,6 +191,7 @@ Type::build('datetime')
     ->useImmutable();
 Type::build('timestamp')
     ->useImmutable();
+Configure::write('Application.developers', [3, 8, 13, 15, 2495]);
 
 /*
  * Custom Inflector rules, can be set to correctly pluralize or singularize

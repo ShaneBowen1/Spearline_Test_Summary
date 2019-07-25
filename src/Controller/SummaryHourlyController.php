@@ -380,7 +380,6 @@ class SummaryHourlyController extends AppController
         // debug($drEndDate);
         // debug($previousStartDate);
         // debug($previousEndDate);
-
         // debug($totalTestsArray);
         // debug($currentOverallTests);
         // debug($previousOverallTests);

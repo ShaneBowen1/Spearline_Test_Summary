@@ -123,7 +123,7 @@ $title = 'Spearline Test Summary';
 <!--top-Header-menu-->
 <div id="user-nav" class="navbar navbar-inverse">
   <ul class="nav">
-    <li class="welcome"><i class="icon icon-user"></i>Welcome</li>
+    <li class="welcome"><i class="icon icon-user"></i>Welcome <?php echo $_SESSION['name']; ?></li>
     <li class="logout"><?php echo $this->Html->link('<i class="icon icon-share-alt"></i> <span class="text">Logout</span>', [ 'controller' => 'User','action' => 'logout'], ['escape' => false]);?></li>
   </ul>
 </div>
