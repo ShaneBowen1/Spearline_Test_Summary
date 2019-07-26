@@ -4,19 +4,18 @@ namespace App\Model\Entity;
 use Cake\ORM\Entity;
 
 /**
- * PasswordResetToken Entity
+ * PasswordResetToken Entity.
  *
  * @property string $token
  * @property int $user_id
- * @property \Cake\I18n\FrozenTime $expires_on
- * @property \Cake\I18n\FrozenTime $added_on
- * @property int $added_by
- * @property int $status
- *
  * @property \App\Model\Entity\User $user
+ * @property \Cake\I18n\Time $expires_on
+ * @property \Cake\I18n\Time $added_on
+ * @property int $added_by
  */
 class PasswordResetToken extends Entity
 {
+
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
      *
@@ -27,20 +26,16 @@ class PasswordResetToken extends Entity
      * @var array
      */
     protected $_accessible = [
-        'user_id' => true,
-        'expires_on' => true,
-        'added_on' => true,
-        'added_by' => true,
-        'status' => true,
-        'user' => true
+        '*' => true,
+        'token' => true,
     ];
 
     /**
-     * Fields that are excluded from JSON versions of the entity.
+     * Fields that are excluded from JSON an array versions of the entity.
      *
      * @var array
      */
     protected $_hidden = [
-        'token'
+    
     ];
 }

@@ -303,6 +303,15 @@ $(document).ready(function(){
     console.log(company_names);
     console.log(test_types);
     console.log(total_test_count);
+
+    //when user clicks forgot password button 
+    $( '#login-forgotpassword' ).click( function() {
+        $( '#login-footer' ).toggleClass( 'hiddenelem' );
+        $( "#text-forgotpassword" ).toggleClass( 'hiddenelem' ); //because is not enaugh space in the box;
+        $( "#text-forgotpassword_login" ).toggleClass( 'hiddenelem' ); //because is not enaugh space in the box;
+        $( '.message' ).addClass( 'hiddenelem' ); //because is not enaugh space in the box;
+        $( '#login-credentials' ).toggleClass( 'hiddenelem' ); //because is not enaugh space in the box;
+    })
     
     google.charts.load('current', {'packages':['corechart']});
     if(typeof search_params['company'] == 'undefined'){

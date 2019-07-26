@@ -193,6 +193,26 @@ Type::build('timestamp')
     ->useImmutable();
 Configure::write('Application.developers', [3, 8, 13, 15, 2495]);
 
+//things for emails
+Configure::write('Application.email.from', 'noreply@spearline.com');
+Configure::write('Application.email.from_name', 'SpearlineAdmin');
+Configure::write('Application.defaultTimezone', 'UTC');
+Configure::write('Application.defaultStartTime', '08:00'); //24 hour format, just hour and minutes
+Configure::write('Application.defaultEndTIme', '18:00'); //24 hour format, just hour and minutes
+
+Configure::write('Application.user.accountActivationTokenValidity', ' +3 days'); //'+x minutes' or '+y hours' or '+z days'
+Configure::write('Application.user.passwordTokenValidity', ' +2 hours'); //'+x minutes' or '+y hours' or '+z days'
+Configure::write('Application.user.token_length', 10);
+
+Configure::write('Application.user.remembermeTokenValidity', ' +2 weeks'); //'+x minutes' or '+y hours' or '+z days'
+Configure::write('Application.user.rememberme_token_length', 10);
+
+Configure::write('Application.user.top_bar_notifications_no', 3);
+
+Configure::write('Application.company.spearlineID', 8);
+
+Configure::write('email', '2000');
+
 /*
  * Custom Inflector rules, can be set to correctly pluralize or singularize
  * table, model, controller names or whatever other string is passed to the

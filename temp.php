@@ -19,7 +19,7 @@ class UserController extends AppController
         parent::initialize();
         $this->Auth->allow(['login', 'logout', 'forgotPassword', 'changeUserPassword','resetUserPassword']);
         $this->loadComponent('StringsFunctions');
-        $this->loadModel('PasswordResetTokens');
+        $this->loadModel('PasswordResetToken');
         $this->loadModel('RemembermeToken');
 
         $this->token_length = intval(Configure::read('Application.user.token_length'));
@@ -102,7 +102,7 @@ class UserController extends AppController
         if(!is_null($user_id) and is_numeric($user_id) and $user_id > 0) {
             $user =  $this->User->find()->where(['User.id'=> $user_id])->leftJoinWith('Company');
             if ($user) {
-                $this->Auth->setUser($user->toArray());
+				$this->Auth->setUser($user->toArray());
                 return $this->redirect($this->Auth->redirectUrl());
             }
         }
@@ -125,7 +125,7 @@ class UserController extends AppController
                     $session->write('name', $user['name']);
                     $session->write('email', $user['email']);
                     $session->write('show_benchmarks', isset($company['show_benchmarks']) ? $company['show_benchmarks'] : null);
-                    $session->write('timezone', $timezone['timezone']);
+					$session->write('timezone', $timezone['timezone']);
                     return $this->redirect($this->Auth->redirectUrl());
                 } else {
                     $rememberme = $this->Cookie->delete('rememberme');
@@ -246,12 +246,12 @@ class UserController extends AppController
 
     public function changeUserPassword($token = null)
 	{
-		if (strlen($token) != $this->token_length or !$this->PasswordResetTokens->isTokenValid($token)) {
+		if (strlen($token) != $this->token_length or !$this->PasswordResetToken->isTokenValid($token)) {
 			$this->Flash->error('Invalid token');
 			return $this->redirect(['action' => 'index']);
 		}
 
-		$token_data = $this->PasswordResetTokens->get($token);
+		$token_data = $this->PasswordResetToken->get($token);
 		if (!$token_data) {
 			$this->Flash->error('Invalid token');
 			return $this->redirect(['action' => 'index']);
@@ -270,7 +270,7 @@ class UserController extends AppController
 
 				// invalidate the user tokens
 
-				$this->PasswordResetTokens->markTokenAsUsed($token);
+				$this->PasswordResetToken->markTokenAsUsed($token);
 				$this->Flash->set('Your password has been reset successfully', ['element' => 'login_success']);
 				$this->redirect(['action' => 'login']);
 			}
@@ -314,9 +314,9 @@ class UserController extends AppController
 		}
 
         $random_string = $this->StringsFunctions->generateRandomString($this->token_length);
-		$token = $this->PasswordResetTokens->newEntity();
-		$token = $this->PasswordResetTokens->patchEntity($token, ['token' => $random_string, 'user_id' => $userid, 'expires_on' => date('Y-m-d H:i:s', strtotime($this->token_validity)) , 'added_on' => date('Y-m-d H:i:s') , 'status' => 1, 'added_by' => $this->Auth->user('id') ]);
-		if ($this->PasswordResetTokens->save($token)) {
+		$token = $this->PasswordResetToken->newEntity();
+		$token = $this->PasswordResetToken->patchEntity($token, ['token' => $random_string, 'user_id' => $userid, 'expires_on' => date('Y-m-d H:i:s', strtotime($this->token_validity)) , 'added_on' => date('Y-m-d H:i:s') , 'status' => 1, 'added_by' => $this->Auth->user('id') ]);
+		if ($this->PasswordResetToken->save($token)) {
 			$email = new Email();
 			$email->transport('mailgun_smtp');
 			$email_settigns = Configure::read('Application.email');
@@ -353,9 +353,9 @@ class UserController extends AppController
 			}
 
 			$random_string = $this->StringsFunctions->generateRandomString($this->token_length);
-			$token = $this->PasswordResetTokens->newEntity();
-			$token = $this->PasswordResetTokens->patchEntity($token, ['token' => $random_string, 'user_id' => $user->id, 'expires_on' => date('Y-m-d H:i:s', strtotime($this->token_validity)) , 'added_on' => date('Y-m-d H:i:s') , 'status' => 1, 'added_by' => $user->id]);
-			if ($this->PasswordResetTokens->save($token)) {
+			$token = $this->PasswordResetToken->newEntity();
+			$token = $this->PasswordResetToken->patchEntity($token, ['token' => $random_string, 'user_id' => $user->id, 'expires_on' => date('Y-m-d H:i:s', strtotime($this->token_validity)) , 'added_on' => date('Y-m-d H:i:s') , 'status' => 1, 'added_by' => $user->id]);
+			if ($this->PasswordResetToken->save($token)) {
 				$email_settigns = Configure::read('Application.email');
 				$email = new Email();
 				$email->transport('mailgun_smtp');
@@ -413,7 +413,7 @@ class UserController extends AppController
 			$user = $this->User->patchEntity($user, array_merge($this->request->data, $comp_array));
 			if ($this->User->save($user)) {
 				$random_string = $this->StringsFunctions->generateRandomString($this->token_length);
-				$token = $this->PasswordResetTokens->newEntity();
+				$token = $this->PasswordResetToken->newEntity();
 				if ($user->timezone_id) {
 					$timezone = $this->User->Timezone->get($user->timezone_id);
 					$valid_token_text = $this->sameDateDiferentTimeZone(date('Y-m-d H:i:s', strtotime($this->activation_token_validity)) , 'UTC', $timezone->timezone);
@@ -423,8 +423,8 @@ class UserController extends AppController
 					$valid_token_text.= '( UTC time )';
 				}
 
-				$token = $this->PasswordResetTokens->patchEntity($token, ['token' => $random_string, 'user_id' => $user->id, 'expires_on' => date('Y-m-d H:i:s', strtotime($this->activation_token_validity)) , 'added_on' => date('Y-m-d H:i:s') , 'status' => 1, 'added_by' => ($this->Auth->user('id') ? $this->Auth->user('id') : $user->id) ]);
-				if ($this->PasswordResetTokens->save($token)) {
+				$token = $this->PasswordResetToken->patchEntity($token, ['token' => $random_string, 'user_id' => $user->id, 'expires_on' => date('Y-m-d H:i:s', strtotime($this->activation_token_validity)) , 'added_on' => date('Y-m-d H:i:s') , 'status' => 1, 'added_by' => ($this->Auth->user('id') ? $this->Auth->user('id') : $user->id) ]);
+				if ($this->PasswordResetToken->save($token)) {
 					$email = new Email();
 					$email->transport('mailgun_smtp');
 					$email_settigns = Configure::read('Application.email');

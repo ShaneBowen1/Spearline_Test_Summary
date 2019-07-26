@@ -136,14 +136,14 @@ class UserTable extends Table
             'foreignKey' => 'created_by'
         ]);
 
-        $this->hasMany('PasswordResetTokens', [
-            'className' => 'PasswordResetTokens',
+        $this->hasMany('PasswordResetToken', [
+            'className' => 'PasswordResetToken',
             'foreignKey' => 'user_id',
             'dependent' => true
         ]);
 
-        $this->hasMany('PasswordResetTokensRequest', [
-            'className' => 'PasswordResetTokens',
+        $this->hasMany('PasswordResetTokenRequest', [
+            'className' => 'PasswordResetToken',
             'foreignKey' => 'added_on',
             'dependent' => true
         ]);

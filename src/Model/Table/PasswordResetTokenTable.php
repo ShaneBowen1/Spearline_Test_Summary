@@ -12,7 +12,7 @@ use Cake\Validation\Validator;
  *
  * @property \Cake\ORM\Association\BelongsTo $User
  */
-class PasswordResetTokensTable extends Table
+class PasswordResetTokenTable extends Table
 {
 
     /**

@@ -4,19 +4,21 @@ namespace App\Model\Entity;
 use Cake\ORM\Entity;
 
 /**
- * RemembermeToken Entity
+ * UserEmailAccount Entity
  *
  * @property int $user_id
- * @property string $token
- * @property string $ip
- * @property string $browser
- * @property \Cake\I18n\Time $expire_date
+ * @property int $email_server_type_id
+ * @property string $host
+ * @property int|null $port
+ * @property string $password
+ * @property string $account
+ * @property bool|null $status
  *
  * @property \App\Model\Entity\User $user
+ * @property \App\Model\Entity\EmailServerType $email_server_type
  */
-class RemembermeToken extends Entity
+class UserEmailAccount extends Entity
 {
-
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
      *
@@ -27,7 +29,15 @@ class RemembermeToken extends Entity
      * @var array
      */
     protected $_accessible = [
-        '*' => true,
+        'user_id' => true,
+        'email_server_type_id' => true,
+        'host' => true,
+        'port' => true,
+        'password' => true,
+        'account' => true,
+        'status' => true,
+        'user' => true,
+        'email_server_type' => true
     ];
 
     /**
@@ -36,5 +46,6 @@ class RemembermeToken extends Entity
      * @var array
      */
     protected $_hidden = [
+        'password'
     ];
 }

@@ -79,7 +79,7 @@ $title = 'Spearline Test Summary';
     <?= $this->Html->script('jquery.tablesorter') ?>
 
     <!--<?= $this->Html->script('bootstrap-datetimepicker.min') ?>-->
-
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore-min.js"></script>
 
     <?= $this->Html->css('default.css') ?>
@@ -103,6 +103,7 @@ $title = 'Spearline Test Summary';
     <?= $this->Html->css('phone.css') ?>
     <?= $this->Html->css('tablet.css') ?>
     <?= $this->Html->css('/fontawesome/css/font-awesome.css') ?>
+    <?= $this->Html->css('awesome/css/font-awesome.min.css') ?>
     <?= $this->Html->css('theme.default.css') ?>
     <!-- <?= $this->Html->css('notify.css') ?> -->
 

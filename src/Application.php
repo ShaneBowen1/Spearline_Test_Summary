@@ -34,6 +34,8 @@ class Application extends BaseApplication
      */
     public function bootstrap()
     {
+        $this->addPlugin('Mailgun');
+
         $this->addPlugin('Search');
 
         // Call parent to load bootstrap from files.

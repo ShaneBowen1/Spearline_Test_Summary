@@ -1,111 +1,146 @@
 <?php
-namespace App\Controller;
+namespace App\Model\Table;
 
-use App\Controller\AppController;
+use App\Model\Entity\PasswordResetToken;
+use Cake\ORM\Query;
+use Cake\ORM\RulesChecker;
+use Cake\ORM\Table;
+use Cake\Validation\Validator;
 
 /**
- * PasswordResetToken Controller
+ * PasswordResetToken Model
  *
- * @property \App\Model\Table\PasswordResetTokenTable $PasswordResetToken
- *
- * @method \App\Model\Entity\PasswordResetToken[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
+ * @property \Cake\ORM\Association\BelongsTo $User
  */
-class PasswordResetTokenController extends AppController
+class PasswordResetTokenTable extends Table
 {
-    /**
-     * Index method
-     *
-     * @return \Cake\Http\Response|null
-     */
-    public function index()
-    {
-        $this->paginate = [
-            'contain' => ['User']
-        ];
-        $passwordResetToken = $this->paginate($this->PasswordResetToken);
-
-        $this->set(compact('passwordResetToken'));
-    }
 
     /**
-     * View method
+     * Initialize method
      *
-     * @param string|null $id Password Reset Token id.
-     * @return \Cake\Http\Response|null
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @param array $config The configuration for the Table.
+     * @return void
      */
-    public function view($id = null)
+    public function initialize(array $config)
     {
-        $passwordResetToken = $this->PasswordResetToken->get($id, [
-            'contain' => ['User']
+        parent::initialize($config);
+
+        $this->table('password_reset_token');
+        $this->displayField('token');
+        $this->primaryKey('token');
+
+        $this->belongsTo('User', [
+            'foreignKey' => 'user_id',
+            'joinType' => 'INNER'
         ]);
 
-        $this->set('passwordResetToken', $passwordResetToken);
-    }
-
-    /**
-     * Add method
-     *
-     * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
-     */
-    public function add()
-    {
-        $passwordResetToken = $this->PasswordResetToken->newEntity();
-        if ($this->request->is('post')) {
-            $passwordResetToken = $this->PasswordResetToken->patchEntity($passwordResetToken, $this->request->getData());
-            if ($this->PasswordResetToken->save($passwordResetToken)) {
-                $this->Flash->success(__('The password reset token has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The password reset token could not be saved. Please, try again.'));
-        }
-        $user = $this->PasswordResetToken->User->find('list', ['limit' => 200]);
-        $this->set(compact('passwordResetToken', 'user'));
-    }
-
-    /**
-     * Edit method
-     *
-     * @param string|null $id Password Reset Token id.
-     * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function edit($id = null)
-    {
-        $passwordResetToken = $this->PasswordResetToken->get($id, [
-            'contain' => []
+        $this->belongsTo('User', [
+            'foreignKey' => 'added_by',
+            'joinType' => 'INNER'
         ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $passwordResetToken = $this->PasswordResetToken->patchEntity($passwordResetToken, $this->request->getData());
-            if ($this->PasswordResetToken->save($passwordResetToken)) {
-                $this->Flash->success(__('The password reset token has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The password reset token could not be saved. Please, try again.'));
-        }
-        $user = $this->PasswordResetToken->User->find('list', ['limit' => 200]);
-        $this->set(compact('passwordResetToken', 'user'));
     }
 
-    /**
-     * Delete method
-     *
-     * @param string|null $id Password Reset Token id.
-     * @return \Cake\Http\Response|null Redirects to index.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
-     */
-    public function delete($id = null)
+    public function markTokenAsUsed($token)
     {
-        $this->request->allowMethod(['post', 'delete']);
-        $passwordResetToken = $this->PasswordResetToken->get($id);
-        if ($this->PasswordResetToken->delete($passwordResetToken)) {
-            $this->Flash->success(__('The password reset token has been deleted.'));
+        $token_data = $this->get($token);
+        if($token_data)
+        {
+            $res = $this->query()
+                        ->update()
+                        ->set(['status' => 2])
+                        ->where(['token' => $token])
+                        ->execute();
+            $affectedRows = $res->rowCount();
+            if($affectedRows == 1){
+                return $this->markUserTokensAsInvalid($token_data->user_id);
+            } else {
+                return false;
+            }
         } else {
-            $this->Flash->error(__('The password reset token could not be deleted. Please, try again.'));
+            return false;
         }
 
-        return $this->redirect(['action' => 'index']);
+    }
+
+    public function markUserTokensAsInvalid($user_id)
+    {
+        $user_tokens = $this->find('all')
+            ->where(['user_id' => $user_id, 'status' => 1])
+            ->toArray();
+        if(count($user_tokens))
+        {
+            $res = $this->query()
+                        ->update()
+                        ->set(['status' => 0])
+                        ->where(['user_id' => $user_id, 'status' => 1])
+                        ->execute();
+            $affectedRows = $res->rowCount();
+            if($affectedRows >= 1){
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function isTokenValid($token)
+    {
+        $token_data = $this->get($token);
+        if(!$token_data)
+        {
+            return false;
+        }
+
+        if($token_data->expires_on->i18nFormat('yyyy-MM-dd HH:mm:ss') < date('Y-m-d H:i:s') || $token_data->status != 1)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Default validation rules.
+     *
+     * @param \Cake\Validation\Validator $validator Validator instance.
+     * @return \Cake\Validation\Validator
+     */
+    public function validationDefault(Validator $validator)
+    {
+        $validator
+            ->notEmpty('token');
+
+        $validator
+            ->dateTime('expires_on')
+            ->requirePresence('expires_on', 'create')
+            ->notEmpty('expires_on');
+
+        $validator
+            ->dateTime('added_on')
+            ->requirePresence('added_on', 'create')
+            ->notEmpty('added_on');
+
+        $validator
+            ->integer('added_by')
+            ->requirePresence('added_by', 'create')
+            ->notEmpty('added_by');
+
+        return $validator;
+    }
+
+    /**
+     * Returns a rules checker object that will be used for validating
+     * application integrity.
+     *
+     * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
+     * @return \Cake\ORM\RulesChecker
+     */
+    public function buildRules(RulesChecker $rules)
+    {
+        $rules->add($rules->existsIn(['user_id'], 'User'));
+        $rules->add($rules->existsIn(['added_by'], 'User'));
+        return $rules;
     }
 }
