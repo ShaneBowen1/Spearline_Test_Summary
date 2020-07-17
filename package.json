@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "dependencies": {
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "lodash.startcase": "^4.4.0",
     "underscore": "^1.9.1"
   },
